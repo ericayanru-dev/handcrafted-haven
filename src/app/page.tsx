@@ -8,7 +8,7 @@ export default function Home() {
         <nav className={styles.nav} aria-label="Primary">
           <a href="#featured">Featured</a>
           <a href="#why">Why Us</a>
-          <a href="#next">Next Steps</a>
+          <a href="#next">Next Steps.</a>
         </nav>
       </header>
 
