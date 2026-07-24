@@ -7,6 +7,8 @@ export const AUTH_CONFIG = {
 
   // JWT Settings (strings for jose library)
   JWT_SECRET: process.env.JWT_SECRET!,
+  JWT_SIGNING_SECRET: process.env.JWT_SIGNING_SECRET,
+  JWT_ENCRYPTION_SECRET: process.env.JWT_ENCRYPTION_SECRET,
   JWT_ACCESS_EXPIRES: "15m",
   JWT_REFRESH_EXPIRES: "7d",
   COOKIE_NAME: "auth_token",
