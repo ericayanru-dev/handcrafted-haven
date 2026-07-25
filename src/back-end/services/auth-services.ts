@@ -142,7 +142,7 @@ export class AuthService {
       await tokenRepo.createRefreshToken(
         user.id,
         refreshToken,
-        new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        new Date(Date.now() + AUTH_CONFIG.JWT_REFRESH_EXPIRES_IN_MS),
       );
 
       return {
