@@ -12,19 +12,38 @@ datasource db {
   provider = "postgresql"
 }
 
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
 model User {
-  id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
-  password      String
-  createdAt     DateTime       @default(now())
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  password        String
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+  lastLoginAt     DateTime?
+
   sellerProfile SellerProfile?
   reviews       Review[]
+  refreshTokens RefreshToken[]
+
+  @@map("user")
 }
 
 model SellerProfile {
   id        String    @id @default(cuid())
-  userId    String       @unique
+  userId    String    @unique
   storeName String
   bio       String?
   rating    Float?
