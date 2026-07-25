@@ -1,6 +1,6 @@
 // src/app/api/auth/verify-email/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { authService } from '@/lib/services/auth-service';
+import { authService } from '@/back-end/services/auth-services';
 
 export async function POST(request: NextRequest) {
   try {
