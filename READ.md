@@ -97,7 +97,7 @@ http://localhost:3000
 
 * Eric Ayanru
 * Joseph Larbi Budu
-* Lau Eduardo Calle Urbina
+* Lau Eduardo Calle Urbina.
 * Arlin Parker Jones
 * Rodrigo Alejandro Pacheco Jorquera
 
