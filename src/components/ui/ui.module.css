@@ -1,0 +1,182 @@
+.container {
+  width: min(var(--content-width), 100%);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+.containerWide {
+  max-width: 72rem;
+}
+
+.containerNarrow {
+  max-width: 56rem;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.cardPadding {
+  padding: 1.5rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.button:focus-visible,
+.field:focus-visible {
+  outline: 3px solid rgba(14, 116, 144, 0.22);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.buttonPrimary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.buttonSecondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background: #eef2f7;
+}
+
+.buttonGhost {
+  background: transparent;
+  color: var(--accent);
+}
+
+.buttonGhost:hover:not(:disabled) {
+  background: rgba(14, 116, 144, 0.08);
+}
+
+.buttonSm {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.92rem;
+}
+
+.buttonMd {
+  min-height: 2.75rem;
+  padding: 0.65rem 1.15rem;
+  font-size: 0.98rem;
+}
+
+.buttonLg {
+  min-height: 3.25rem;
+  padding: 0.85rem 1.4rem;
+  font-size: 1.02rem;
+}
+
+.buttonFullWidth {
+  width: 100%;
+}
+
+.fieldGroup {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hint,
+.error {
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.hint {
+  color: var(--text-secondary);
+}
+
+.error {
+  color: var(--error);
+}
+
+.field {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 0.75rem 0.95rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.field::placeholder {
+  color: #8b93a1;
+}
+
+.field:hover {
+  border-color: var(--border-strong);
+}
+
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.12);
+}
+
+.fieldInvalid {
+  border-color: var(--error);
+}
+
+.fieldInvalid:focus {
+  box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.12);
+}
+
+.fieldDisabled {
+  background: #f4f5f7;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
