@@ -31,6 +31,7 @@ export type UserMinAggregateOutputType = {
   password: string | null
   emailVerified: boolean | null
   emailVerifiedAt: Date | null
+  location: string | null
   createdAt: Date | null
   lastLoginAt: Date | null
 }
@@ -42,6 +43,7 @@ export type UserMaxAggregateOutputType = {
   password: string | null
   emailVerified: boolean | null
   emailVerifiedAt: Date | null
+  location: string | null
   createdAt: Date | null
   lastLoginAt: Date | null
 }
@@ -53,6 +55,7 @@ export type UserCountAggregateOutputType = {
   password: number
   emailVerified: number
   emailVerifiedAt: number
+  location: number
   createdAt: number
   lastLoginAt: number
   _all: number
@@ -66,6 +69,7 @@ export type UserMinAggregateInputType = {
   password?: true
   emailVerified?: true
   emailVerifiedAt?: true
+  location?: true
   createdAt?: true
   lastLoginAt?: true
 }
@@ -77,6 +81,7 @@ export type UserMaxAggregateInputType = {
   password?: true
   emailVerified?: true
   emailVerifiedAt?: true
+  location?: true
   createdAt?: true
   lastLoginAt?: true
 }
@@ -88,6 +93,7 @@ export type UserCountAggregateInputType = {
   password?: true
   emailVerified?: true
   emailVerifiedAt?: true
+  location?: true
   createdAt?: true
   lastLoginAt?: true
   _all?: true
@@ -172,6 +178,7 @@ export type UserGroupByOutputType = {
   password: string
   emailVerified: boolean
   emailVerifiedAt: Date | null
+  location: string | null
   createdAt: Date
   lastLoginAt: Date | null
   _count: UserCountAggregateOutputType | null
@@ -204,6 +211,7 @@ export type UserWhereInput = {
   password?: Prisma.StringFilter<"User"> | string
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  location?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sellerProfile?: Prisma.XOR<Prisma.SellerProfileNullableScalarRelationFilter, Prisma.SellerProfileWhereInput> | null
@@ -218,6 +226,7 @@ export type UserOrderByWithRelationInput = {
   password?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  location?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sellerProfile?: Prisma.SellerProfileOrderByWithRelationInput
@@ -235,6 +244,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringFilter<"User"> | string
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  location?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sellerProfile?: Prisma.XOR<Prisma.SellerProfileNullableScalarRelationFilter, Prisma.SellerProfileWhereInput> | null
@@ -249,6 +259,7 @@ export type UserOrderByWithAggregationInput = {
   password?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  location?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -266,6 +277,7 @@ export type UserScalarWhereWithAggregatesInput = {
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  location?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
@@ -277,6 +289,7 @@ export type UserCreateInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutUserInput
@@ -291,6 +304,7 @@ export type UserUncheckedCreateInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutUserInput
@@ -305,6 +319,7 @@ export type UserUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerProfile?: Prisma.SellerProfileUpdateOneWithoutUserNestedInput
@@ -319,6 +334,7 @@ export type UserUncheckedUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -333,6 +349,7 @@ export type UserCreateManyInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
 }
@@ -344,6 +361,7 @@ export type UserUpdateManyMutationInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -355,6 +373,7 @@ export type UserUncheckedUpdateManyInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -371,6 +390,7 @@ export type UserCountOrderByAggregateInput = {
   password?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
 }
@@ -382,6 +402,7 @@ export type UserMaxOrderByAggregateInput = {
   password?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
 }
@@ -393,6 +414,7 @@ export type UserMinOrderByAggregateInput = {
   password?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
 }
@@ -413,6 +435,10 @@ export type UserUpdateOneRequiredWithoutRefreshTokensNestedInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type UserCreateNestedOneWithoutSellerProfileInput = {
@@ -450,6 +476,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutUserInput
@@ -463,6 +490,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutUserInput
@@ -492,6 +520,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerProfile?: Prisma.SellerProfileUpdateOneWithoutUserNestedInput
@@ -505,6 +534,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -518,6 +548,7 @@ export type UserCreateWithoutSellerProfileInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
@@ -531,6 +562,7 @@ export type UserUncheckedCreateWithoutSellerProfileInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
@@ -560,6 +592,7 @@ export type UserUpdateWithoutSellerProfileInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
@@ -573,6 +606,7 @@ export type UserUncheckedUpdateWithoutSellerProfileInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
@@ -586,6 +620,7 @@ export type UserCreateWithoutReviewsInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutUserInput
@@ -599,6 +634,7 @@ export type UserUncheckedCreateWithoutReviewsInput = {
   password: string
   emailVerified?: boolean
   emailVerifiedAt?: Date | string | null
+  location?: string | null
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutUserInput
@@ -628,6 +664,7 @@ export type UserUpdateWithoutReviewsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerProfile?: Prisma.SellerProfileUpdateOneWithoutUserNestedInput
@@ -641,6 +678,7 @@ export type UserUncheckedUpdateWithoutReviewsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -694,6 +732,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   password?: boolean
   emailVerified?: boolean
   emailVerifiedAt?: boolean
+  location?: boolean
   createdAt?: boolean
   lastLoginAt?: boolean
   sellerProfile?: boolean | Prisma.User$sellerProfileArgs<ExtArgs>
@@ -709,6 +748,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   password?: boolean
   emailVerified?: boolean
   emailVerifiedAt?: boolean
+  location?: boolean
   createdAt?: boolean
   lastLoginAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -720,6 +760,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   password?: boolean
   emailVerified?: boolean
   emailVerifiedAt?: boolean
+  location?: boolean
   createdAt?: boolean
   lastLoginAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -731,11 +772,12 @@ export type UserSelectScalar = {
   password?: boolean
   emailVerified?: boolean
   emailVerifiedAt?: boolean
+  location?: boolean
   createdAt?: boolean
   lastLoginAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "emailVerified" | "emailVerifiedAt" | "createdAt" | "lastLoginAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "emailVerified" | "emailVerifiedAt" | "location" | "createdAt" | "lastLoginAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sellerProfile?: boolean | Prisma.User$sellerProfileArgs<ExtArgs>
   reviews?: boolean | Prisma.User$reviewsArgs<ExtArgs>
@@ -759,6 +801,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     password: string
     emailVerified: boolean
     emailVerifiedAt: Date | null
+    location: string | null
     createdAt: Date
     lastLoginAt: Date | null
   }, ExtArgs["result"]["user"]>
@@ -1193,6 +1236,7 @@ export interface UserFieldRefs {
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly location: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
 }

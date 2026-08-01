@@ -849,6 +849,7 @@ export const UserScalarFieldEnum = {
   password: 'password',
   emailVerified: 'emailVerified',
   emailVerifiedAt: 'emailVerifiedAt',
+  location: 'location',
   createdAt: 'createdAt',
   lastLoginAt: 'lastLoginAt'
 } as const
@@ -861,7 +862,9 @@ export const SellerProfileScalarFieldEnum = {
   userId: 'userId',
   storeName: 'storeName',
   bio: 'bio',
-  rating: 'rating'
+  rating: 'rating',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type SellerProfileScalarFieldEnum = (typeof SellerProfileScalarFieldEnum)[keyof typeof SellerProfileScalarFieldEnum]
@@ -874,7 +877,11 @@ export const ProductScalarFieldEnum = {
   description: 'description',
   price: 'price',
   stock: 'stock',
-  createdAt: 'createdAt'
+  category: 'category',
+  imageUrl: 'imageUrl',
+  rating: 'rating',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
@@ -886,7 +893,8 @@ export const ReviewScalarFieldEnum = {
   userId: 'userId',
   rating: 'rating',
   comment: 'comment',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]

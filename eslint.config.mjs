@@ -1,67 +1,68 @@
+// eslint.config.mjs
+
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
 import globals from "globals";
+import tseslint from "typescript-eslint";
 
-const eslintConfig = defineConfig([
+export default defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Prettier integration
+
   prettierRecommended,
-  // Custom rules for your project
+
   {
-    files: ["**/*.{ts,tsx,js}"], // Only TypeScript and javascript files
-    parser: "@typescript-eslint/parser",
-    parserOptions: {
-      project: "./tsconfig.json", // 👈 points to your tsconfig
-      tsconfigRootDir: __dirname, // ensures relative paths work
-    },
+    files: ["**/*.{js,mjs,cjs,ts,tsx}"],
+
     languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: "module",
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["*.mjs", "*.js"],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
       globals: {
         ...globals.browser,
         ...globals.node,
         ...globals.jest,
       },
     },
+
     rules: {
-      // Prettier formatting issues = errors
+      // Prettier
       "prettier/prettier": [
         "warn",
         {
-          singleQuote: true,
+          singleQuote: false,
           semi: true,
-          endOfLine: "lf",
           trailingComma: "es5",
-          tabWidth: 2,
           printWidth: 100,
+          tabWidth: 2,
+          endOfLine: "auto", // Better for Windows
         },
       ],
 
-      // TypeScript rules
+      // TypeScript
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-floating-promises": "error",
 
-      // General rules
-      "no-console": "warn", // Warn on console logs
-      eqeqeq: ["error", "always"], // Enforce strict equality
+      // General
+      "no-console": "warn",
+      eqeqeq: ["error", "always"],
     },
   },
-  // Override default ignores of eslint-config-next.
+
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
-    "next-env.d.ts",
-    "node_modules/**",
     "dist/**",
     "coverage/**",
+    "node_modules/**",
+    "next-env.d.ts",
   ]),
 ]);
-
-export default eslintConfig;

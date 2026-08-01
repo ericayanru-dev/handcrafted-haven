@@ -1,8 +1,8 @@
 // src/lib/repositories/token-repo.ts
-import 'dotenv/config'; // ← Added
+import "dotenv/config"; // ← Added
 
-import { prisma } from '../database/db';
-import { RefreshToken } from '../types/token-types';
+import { prisma } from "../database/db";
+import type { RefreshToken } from "../types/token-types";
 
 export class TokenRepo {
   async createRefreshToken(userId: string, token: string, expiresAt: Date): Promise<RefreshToken> {

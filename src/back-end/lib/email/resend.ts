@@ -1,12 +1,12 @@
 // src/lib/email/resend.ts
-import { Resend } from 'resend';
-import { AUTH_CONFIG } from '../../config/auth';
+import { Resend } from "resend";
+import { AUTH_CONFIG } from "../../config/auth";
 
-import WelcomeEmail from './templates/auth/welcome-email-template';
-import VerifyEmail from './templates/auth/verification-email-template';
-import ResetPasswordEmail from './templates/auth/rest-password-email-template';
-import PasswordChangedEmail from './templates/auth/password-changed-email-template';
-import LoginAlertEmail from './templates/auth/login-alert-emaill-template';
+import WelcomeEmail from "./templates/auth/welcome-email-template";
+import VerifyEmail from "./templates/auth/verification-email-template";
+import ResetPasswordEmail from "./templates/auth/rest-password-email-template";
+import PasswordChangedEmail from "./templates/auth/password-changed-email-template";
+import LoginAlertEmail from "./templates/auth/login-alert-emaill-template";
 
 const resend = new Resend(AUTH_CONFIG.RESEND_API_KEY);
 
@@ -16,7 +16,16 @@ type EmailPayload =
   | { type: "verification"; props: { firstName: string; verifyUrl: string; code?: string } }
   | { type: "password-reset"; props: { firstName: string; resetUrl: string } }
   | { type: "password-changed"; props: { firstName: string } }
-  | { type: "login-alert"; props: { firstName: string; location: string; device: string; time: string; ipAddress?: string } };
+  | {
+      type: "login-alert";
+      props: {
+        firstName: string;
+        location: string;
+        device: string;
+        time: string;
+        ipAddress?: string;
+      };
+    };
 
 export async function sendEmail(to: string, payload: EmailPayload) {
   try {
@@ -50,7 +59,8 @@ export async function sendEmail(to: string, payload: EmailPayload) {
         break;
 
       default:
-        throw new Error(`Unknown email type: ${JSON.stringify(payload)}`);    }
+        throw new Error(`Unknown email type: ${JSON.stringify(payload)}`);
+    }
 
     const { data, error } = await resend.emails.send({
       from: "Handcrafted Haven <onboarding@resend.dev>",

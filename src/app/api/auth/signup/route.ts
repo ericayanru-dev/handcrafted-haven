@@ -1,7 +1,8 @@
 // src/app/api/auth/signup/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { authService } from '@/back-end/services/auth-services';
-import type { SignupRequest } from '@/back-end/types/auth-types';
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { authService } from "@/back-end/services/auth-services";
+import type { SignupRequest } from "@/back-end/types/auth-types";
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,10 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(result, { status: 400 });
     }
   } catch (error) {
-    console.error('Signup API Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error("Signup API Error:", error);
+    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 }

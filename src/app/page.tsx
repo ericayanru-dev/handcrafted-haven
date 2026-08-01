@@ -1,36 +1,36 @@
-import { Button, Card, Container } from "@/components/ui";
-import styles from "./page.module.css";
+import { Button, Card, Container } from '@/components/ui';
+import styles from './page.module.css';
 
 const featuredProducts = [
   {
-    title: "Hand-thrown ceramic mug",
-    category: "Home Decor",
-    description: "Warm-toned stoneware with a matte glaze and a comfortable grip.",
+    title: 'Hand-thrown ceramic mug',
+    category: 'Home Decor',
+    description: 'Warm-toned stoneware with a matte glaze and a comfortable grip.',
   },
   {
-    title: "Woven market tote",
-    category: "Wearables",
-    description: "Durable handmade cotton with natural fibers and reinforced handles.",
+    title: 'Woven market tote',
+    category: 'Wearables',
+    description: 'Durable handmade cotton with natural fibers and reinforced handles.',
   },
   {
-    title: "Beaded gift bracelet",
-    category: "Gift Ideas",
-    description: "A subtle handcrafted accent with a thoughtful presentation box.",
+    title: 'Beaded gift bracelet',
+    category: 'Gift Ideas',
+    description: 'A subtle handcrafted accent with a thoughtful presentation box.',
   },
 ];
 
 const categories = [
   {
-    title: "Home Decor",
-    description: "Ceramics, textiles, wall art, and pieces that make a space feel lived in.",
+    title: 'Home Decor',
+    description: 'Ceramics, textiles, wall art, and pieces that make a space feel lived in.',
   },
   {
-    title: "Wearables",
-    description: "Jewelry, bags, scarves, and artisan-made clothing accessories.",
+    title: 'Wearables',
+    description: 'Jewelry, bags, scarves, and artisan-made clothing accessories.',
   },
   {
-    title: "Gift Ideas",
-    description: "Small-batch items and one-of-a-kind presents for important moments.",
+    title: 'Gift Ideas',
+    description: 'Small-batch items and one-of-a-kind presents for important moments.',
   },
 ];
 
@@ -42,8 +42,8 @@ export default function Home() {
           <p className={styles.eyebrow}>WDD 430 Group Project</p>
           <h1>Shop handmade goods from real makers in one place.</h1>
           <p>
-            This is the starting page for Handcrafted Haven. It gives us a place to
-            show products, browse categories, and add seller profiles and reviews.
+            This is the starting page for Handcrafted Haven. It gives us a place to show products,
+            browse categories, and add seller profiles and reviews.
           </p>
           <div className={styles.ctas}>
             <Button href="#featured">Explore Products</Button>
@@ -86,8 +86,7 @@ export default function Home() {
               <h2>Easy browsing paths for shoppers.</h2>
             </div>
             <p className={styles.sectionLead}>
-              These blocks leave room for filters, sorting, and fuller product views
-              later on.
+              These blocks leave room for filters, sorting, and fuller product views later on.
             </p>
           </div>
 
@@ -127,11 +126,11 @@ export default function Home() {
             <div className={styles.ctaContent}>
               <div>
                 <p className={styles.eyebrow}>Next steps</p>
-                  <h2>Keep building from this starting point.</h2>
+                <h2>Keep building from this starting point.</h2>
               </div>
               <p className={styles.sectionLead}>
-                  Later we can connect auth, live product data, and the seller dashboard
-                  without changing the layout again.
+                Later we can connect auth, live product data, and the seller dashboard without
+                changing the layout again.
               </p>
             </div>
 
