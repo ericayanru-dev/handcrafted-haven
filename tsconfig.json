@@ -20,15 +20,18 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@/back-end/*": ["./src/back-end/*"],
     }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.mts",
+    "**/*.mjs",
+    "eslint.config.mjs",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

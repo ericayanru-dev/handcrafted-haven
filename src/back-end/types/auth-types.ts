@@ -14,11 +14,11 @@ export interface User {
   id: string;
   name: string;
   email: string;
-
 }
 export interface UserUpdateData {
   name?: string;
   email?: string;
   password?: string;
   lastLoginAt?: Date;
+  location?: string;
 }

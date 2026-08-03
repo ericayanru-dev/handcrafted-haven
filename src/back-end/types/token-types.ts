@@ -1,4 +1,4 @@
-import { JWTPayload } from "jose";
+import type { JWTPayload } from "jose";
 
 export type TokenType = "ACCESS" | "REFRESH" | "RESET" | "VERIFY";
 

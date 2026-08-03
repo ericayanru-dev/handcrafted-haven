@@ -114,7 +114,7 @@ export async function proxy(request: NextRequest) {
   if (isPublicRoute && accessToken) {
     try {
       await TokenService.verifyToken(accessToken);
-      return NextResponse.redirect(new URL("/auth/dashboard", request.url)); // Fixed: was relative path
+      return NextResponse.redirect(new URL("/dashboard", request.url)); // Fixed: was relative path
     } catch {
       // Invalid token, allow access to auth pages
       return NextResponse.redirect(new URL("/auth/login", request.url));
