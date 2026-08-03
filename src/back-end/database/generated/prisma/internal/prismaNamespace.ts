@@ -863,6 +863,7 @@ export const SellerProfileScalarFieldEnum = {
   storeName: 'storeName',
   bio: 'bio',
   rating: 'rating',
+  location: 'location',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

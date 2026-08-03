@@ -21,7 +21,7 @@ export class SellerProfileModel {
               { storeName: { contains: search, mode: "insensitive" } },
               { bio: { contains: search, mode: "insensitive" } },
               { user: { name: { contains: search, mode: "insensitive" } } },
-              { location: { location: { contains: search, mode: "insensitive" } } },
+              { location: { contains: search, mode: "insensitive" } },
             ],
           }
         : undefined,
