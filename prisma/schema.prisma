@@ -46,6 +46,7 @@ model SellerProfile {
   storeName String
   bio       String?
   rating    Float?
+  location  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -56,17 +57,17 @@ model SellerProfile {
 }
 
 model Product {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   sellerId    String
   title       String
   description String
-  price       Decimal @db.Decimal(10, 2)
-  stock       Int     @default(0)
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
   category    String
   imageUrl    String?
   rating      Float?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   seller  SellerProfile @relation(fields: [sellerId], references: [id], onDelete: Cascade)
