@@ -12,25 +12,26 @@ const highlights = [
     text: "Validation and backend errors show up right in the form.",
   },
   {
-    title: "Uses the same pieces",
-    text: "Buttons, inputs, cards, and spacing match the rest of the site.",
+    title: "Familiar layout",
+    text: "Buttons, inputs, cards, and spacing feel consistent with the rest of the site.",
   },
 ];
 
 type LoginPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     registered?: string;
-  };
+  }>;
 };
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
-  const showRegisteredMessage = searchParams?.registered === "1";
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const showRegisteredMessage = resolvedSearchParams?.registered === "1";
 
   return (
     <main className={styles.page}>
       <Container className={styles.layout}>
         <section className={styles.intro}>
-          <p className={styles.eyebrow}>Login page</p>
+          <p className={styles.eyebrow}>Welcome back</p>
           <h1 className={styles.title}>Sign back in to Handcrafted Haven.</h1>
           <p className={styles.subtitle}>
             Sign in to keep browsing, manage products, or pick up where you left off.
@@ -49,8 +50,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         <div className={styles.formCard}>
           {showRegisteredMessage ? (
             <p className={styles.success}>
-              Your account was created. Check your email for verification, then sign
-              in here.
+              Your account was created. Check your email for verification, then sign in here.
             </p>
           ) : null}
           <AuthForm mode="login" />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins, Source_Sans_3 } from "next/font/google";
+import { CartProvider } from "@/components/cart";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import "./globals.css";
@@ -33,9 +34,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} ${sourceSans.variable}`}>
       <body>
-        <Navbar />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

@@ -43,11 +43,13 @@
   gap: 0.5rem;
 }
 
-.navLink {
+.navLink,
+.navLinkActive {
   padding: 0.65rem 0.9rem;
   border-radius: 999px;
   color: var(--text-secondary);
   font-weight: 600;
+  white-space: nowrap;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
@@ -59,10 +61,36 @@
   background: rgba(255, 255, 255, 0.72);
 }
 
+.navLinkActive {
+  border: 1px solid rgba(14, 116, 144, 0.2);
+}
+
+.navLink:focus-visible,
+.brandLink:focus-visible,
+.menuButton:focus-visible,
+.mobileNavLink:focus-visible,
+.mobileNavLinkActive:focus-visible,
+.footerLink:focus-visible,
+.userPill:focus-visible,
+.cartIcon:focus-visible {
+  outline: 3px solid rgba(14, 116, 144, 0.45);
+  outline-offset: 2px;
+}
+
 .navActions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.userPill {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.48rem 0.75rem;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 .menuButton {
@@ -116,6 +144,14 @@
   font-weight: 600;
 }
 
+.mobileNavLinkActive {
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.9rem;
+  color: var(--accent);
+  background: rgba(14, 116, 144, 0.1);
+  font-weight: 700;
+}
+
 .mobileNavLink:hover {
   background: rgba(14, 116, 144, 0.08);
 }
@@ -126,6 +162,16 @@
   margin-top: 0.35rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
+}
+
+.navError {
+  border: 1px solid rgba(185, 28, 28, 0.22);
+  border-radius: var(--radius-md);
+  background: rgba(185, 28, 28, 0.08);
+  color: var(--error);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 0.75rem 0.85rem;
 }
 
 .footer {
