@@ -1,19 +1,26 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Button, Card } from "@/components/ui";
 import styles from "./product-pages.module.css";
 
 const productSchema = z.object({
-  title: z.string().trim().min(2, "Title must be at least 2 characters").max(150, "Title is too long"),
+  title: z
+    .string()
+    .trim()
+    .min(2, "Title must be at least 2 characters")
+    .max(150, "Title is too long"),
   description: z
     .string()
     .trim()
     .min(10, "Description must be at least 10 characters")
     .max(2000, "Description is too long"),
-  price: z.coerce.number().positive("Price must be greater than 0").max(999999, "Price is too high"),
+  price: z.coerce
+    .number()
+    .positive("Price must be greater than 0")
+    .max(999999, "Price is too high"),
   stock: z.coerce.number().int("Stock must be a whole number").min(0, "Stock cannot be negative"),
   category: z.string().trim().min(2, "Category is required").max(50, "Category is too long"),
   imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
@@ -64,13 +71,13 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string | null>(initialValues?.imageUrl ?? null);
-  const fileReaderRef = useRef<FileReader | null>(null);
 
   const heading = mode === "create" ? "Create product" : "Edit product";
 
   const endpoint = useMemo(() => {
-    return mode === "create" ? "/api/product/create" : `/api/product/edit/${productId}`;
+    return mode === "create" ? "../../api/product/create" : `../../api/product/create${productId}`;
   }, [mode, productId]);
 
   function updateField(field: keyof ProductFormValues, value: string) {
@@ -79,32 +86,74 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
     if (fieldErrors[field]) {
       setFieldErrors((current) => ({ ...current, [field]: undefined }));
     }
-    if (formError) {
-      setFormError("");
-    }
-    if (formSuccess) {
-      setFormSuccess("");
-    }
+    if (formError) setFormError("");
+    if (formSuccess) setFormSuccess("");
   }
 
-  function handleImageFile(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
+  /**
+   * Upload image to Vercel Blob via /api/upload
+   */
+  const uploadIdRef = useRef(0);
 
-    const reader = new FileReader();
-    fileReaderRef.current = reader;
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setPreviewSrc(reader.result);
+  async function handleImageFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Increase the ID so older uploads become "stale"
+    const currentUploadId = ++uploadIdRef.current;
+
+    // Local preview
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewSrc(objectUrl);
+
+    setIsUploading(true);
+    setFormError("");
+    setFieldErrors((current) => ({ ...current, imageUrl: undefined }));
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      // Ignore this response if the user already selected another file
+      if (currentUploadId !== uploadIdRef.current) {
+        return;
       }
-    };
-    reader.readAsDataURL(file);
+
+      if (!res.ok || !result.success) {
+        setFormError(result.message || "Image upload failed");
+        setPreviewSrc(initialValues?.imageUrl ?? null);
+        return;
+      }
+
+      updateField("imageUrl", result.data.url);
+      setPreviewSrc(result.data.url);
+    } catch {
+      if (currentUploadId !== uploadIdRef.current) return;
+
+      setFormError("Could not upload image. Please try again.");
+      setPreviewSrc(initialValues?.imageUrl ?? null);
+    } finally {
+      if (currentUploadId === uploadIdRef.current) {
+        setIsUploading(false);
+      }
+      URL.revokeObjectURL(objectUrl);
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (isUploading) {
+      setFormError("Please wait for the image to finish uploading.");
+      return;
+    }
 
     const validation = productSchema.safeParse(values);
 
@@ -175,39 +224,47 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
 
   return (
     <Card>
-      <form aria-busy={isSubmitting} className={styles.form} noValidate onSubmit={handleSubmit}>
+      <form
+        aria-busy={isSubmitting || isUploading}
+        className={styles.form}
+        noValidate
+        onSubmit={handleSubmit}
+      >
         <div>
           <p className={styles.eyebrow}>Product form</p>
           <h2 className={styles.title}>{heading}</h2>
         </div>
 
         <div className={styles.formGrid}>
+          {/* Title */}
           <label className={styles.fieldGroup} htmlFor="title">
             <span className={styles.label}>Title</span>
             <input
               className={styles.field}
               disabled={isSubmitting}
               id="title"
-              onChange={(event) => updateField("title", event.target.value)}
+              onChange={(e) => updateField("title", e.target.value)}
               required
               value={values.title}
             />
-            {fieldErrors.title ? <p className={styles.error}>{fieldErrors.title}</p> : null}
+            {fieldErrors.title && <p className={styles.error}>{fieldErrors.title}</p>}
           </label>
 
+          {/* Category */}
           <label className={styles.fieldGroup} htmlFor="category">
             <span className={styles.label}>Category</span>
             <input
               className={styles.field}
               disabled={isSubmitting}
               id="category"
-              onChange={(event) => updateField("category", event.target.value)}
+              onChange={(e) => updateField("category", e.target.value)}
               required
               value={values.category}
             />
-            {fieldErrors.category ? <p className={styles.error}>{fieldErrors.category}</p> : null}
+            {fieldErrors.category && <p className={styles.error}>{fieldErrors.category}</p>}
           </label>
 
+          {/* Price */}
           <label className={styles.fieldGroup} htmlFor="price">
             <span className={styles.label}>Price</span>
             <input
@@ -216,15 +273,16 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               id="price"
               inputMode="decimal"
               min="0.01"
-              onChange={(event) => updateField("price", event.target.value)}
+              onChange={(e) => updateField("price", e.target.value)}
               required
               step="0.01"
               type="number"
               value={values.price}
             />
-            {fieldErrors.price ? <p className={styles.error}>{fieldErrors.price}</p> : null}
+            {fieldErrors.price && <p className={styles.error}>{fieldErrors.price}</p>}
           </label>
 
+          {/* Stock */}
           <label className={styles.fieldGroup} htmlFor="stock">
             <span className={styles.label}>Stock</span>
             <input
@@ -233,79 +291,76 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               id="stock"
               inputMode="numeric"
               min="0"
-              onChange={(event) => updateField("stock", event.target.value)}
+              onChange={(e) => updateField("stock", e.target.value)}
               required
               step="1"
               type="number"
               value={values.stock}
             />
-            {fieldErrors.stock ? <p className={styles.error}>{fieldErrors.stock}</p> : null}
+            {fieldErrors.stock && <p className={styles.error}>{fieldErrors.stock}</p>}
           </label>
 
+          {/* Description */}
           <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="description">
             <span className={styles.label}>Description</span>
             <textarea
               className={styles.textarea}
               disabled={isSubmitting}
               id="description"
-              onChange={(event) => updateField("description", event.target.value)}
+              onChange={(e) => updateField("description", e.target.value)}
               required
               value={values.description}
             />
-            {fieldErrors.description ? <p className={styles.error}>{fieldErrors.description}</p> : null}
+            {fieldErrors.description && <p className={styles.error}>{fieldErrors.description}</p>}
           </label>
 
+          {/* Image Upload */}
           <div className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}>
-            <span className={styles.label}>Image upload</span>
+            <span className={styles.label}>Product Image</span>
             <div className={styles.uploadRow}>
               <div className={styles.uploadControls}>
                 <input
-                  accept="image/*"
-                  disabled={isSubmitting}
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  disabled={isSubmitting || isUploading}
                   onChange={handleImageFile}
                   type="file"
                 />
-                <span className={styles.hint}>You can preview a local file here, then paste the image URL to save it.</span>
+                <span className={styles.hint}>
+                  {isUploading ? "Uploading image..." : "JPEG, PNG or WebP. Max 4MB."}
+                </span>
               </div>
 
-              {previewSrc ? <img alt="Selected product preview" className={styles.uploadPreview} src={previewSrc} /> : null}
+              {previewSrc && (
+                <img alt="Product preview" className={styles.uploadPreview} src={previewSrc} />
+              )}
 
-              <label className={styles.fieldGroup} htmlFor="imageUrl">
-                <span className={styles.label}>Image URL</span>
-                <input
-                  className={styles.field}
-                  disabled={isSubmitting}
-                  id="imageUrl"
-                  onChange={(event) => {
-                    updateField("imageUrl", event.target.value);
-                    if (event.target.value) {
-                      setPreviewSrc(event.target.value);
-                    }
-                  }}
-                  placeholder="https://example.com/photo.jpg"
-                  type="url"
-                  value={values.imageUrl}
-                />
-                {fieldErrors.imageUrl ? <p className={styles.error}>{fieldErrors.imageUrl}</p> : null}
-              </label>
+              {/* Hidden but still part of form state */}
+              <input type="hidden" value={values.imageUrl} readOnly />
             </div>
+            {fieldErrors.imageUrl && <p className={styles.error}>{fieldErrors.imageUrl}</p>}
           </div>
         </div>
 
-        {formError ? (
+        {formError && (
           <p aria-live="polite" className={styles.error} role="alert">
             {formError}
           </p>
-        ) : null}
-        {formSuccess ? (
+        )}
+        {formSuccess && (
           <p aria-live="polite" className={styles.success} role="status">
             {formSuccess}
           </p>
-        ) : null}
+        )}
 
         <div className={styles.actions}>
-          <Button disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Saving..." : mode === "create" ? "Create product" : "Save product"}
+          <Button disabled={isSubmitting || isUploading} type="submit">
+            {isUploading
+              ? "Uploading image..."
+              : isSubmitting
+                ? "Saving..."
+                : mode === "create"
+                  ? "Create product"
+                  : "Save product"}
           </Button>
           <Button href="/products" variant="secondary">
             Cancel

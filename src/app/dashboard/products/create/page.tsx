@@ -12,7 +12,9 @@ export default function CreateProductPage() {
               <p className={styles.eyebrow}>Create product</p>
               <h1 className={styles.title}>Add a new product listing</h1>
             </div>
-            <p className={styles.lead}>Fill in product details and publish it to your seller profile.</p>
+            <p className={styles.lead}>
+              Fill in product details and publish it to your seller profile.
+            </p>
           </div>
 
           <ProductForm mode="create" />
