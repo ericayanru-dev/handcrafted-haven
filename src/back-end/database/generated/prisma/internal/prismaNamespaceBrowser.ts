@@ -57,6 +57,8 @@ export const ModelName = {
   Product: 'Product',
   Cart: 'Cart',
   CartItem: 'CartItem',
+  Order: 'Order',
+  OrderItem: 'OrderItem',
   Review: 'Review'
 } as const
 
@@ -154,6 +156,31 @@ export const CartItemScalarFieldEnum = {
 } as const
 
 export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
+
+
+export const OrderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  status: 'status',
+  total: 'total',
+  reference: 'reference',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  productId: 'productId',
+  quantity: 'quantity',
+  price: 'price',
+  title: 'title'
+} as const
+
+export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {

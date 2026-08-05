@@ -9,7 +9,13 @@
 * 🟢 You can import this file directly.
 */
 
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  SHIPPED: 'SHIPPED',
+  COMPLETED: 'COMPLETED'
+} as const
 
-
-// This file is empty because there are no enums in the schema.
-export {}
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
