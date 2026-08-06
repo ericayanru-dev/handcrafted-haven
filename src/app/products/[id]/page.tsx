@@ -124,7 +124,9 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
           <Card className={styles.section}>
             <p className={styles.eyebrow}>Product details</p>
             <h1 className={styles.title}>Product not found</h1>
-            <p className={styles.lead}>This product may have been removed or the link is no longer valid.</p>
+            <p className={styles.lead}>
+              This product may have been removed or the link is no longer valid.
+            </p>
             <div className={styles.actions}>
               <Button href="/products">Back to products</Button>
             </div>
@@ -171,10 +173,16 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
                 <span>Seller: {product.seller?.user?.name ?? "Unknown"}</span>
               </div>
 
-              {addedMessage || cartMessage ? <p className={styles.success}>{addedMessage || cartMessage}</p> : null}
+              {addedMessage || cartMessage ? (
+                <p className={styles.success}>{addedMessage || cartMessage}</p>
+              ) : null}
 
               <div className={styles.actions}>
-                <Button disabled={cartIsMutating || product.stock <= 0} onClick={handleAddToCart} type="button">
+                <Button
+                  disabled={cartIsMutating || product.stock <= 0}
+                  onClick={handleAddToCart}
+                  type="button"
+                >
                   {product.stock > 0 ? "Add to cart" : "Out of stock"}
                 </Button>
                 <Button href={`/dashboard/products/edit/${product.id}`}>Edit product</Button>

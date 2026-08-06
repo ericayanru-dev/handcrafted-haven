@@ -135,7 +135,11 @@ export default function ProductListingPage() {
               placeholder="Category"
               value={category}
             />
-            <select className={styles.select} onChange={(event) => setSortBy(event.target.value)} value={sortBy}>
+            <select
+              className={styles.select}
+              onChange={(event) => setSortBy(event.target.value)}
+              value={sortBy}
+            >
               <option value="newest">Newest</option>
               <option value="price-asc">Price: low to high</option>
               <option value="price-desc">Price: high to low</option>
