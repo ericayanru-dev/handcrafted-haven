@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Button, Card } from "@/components/ui";
@@ -25,6 +25,17 @@ const productSchema = z.object({
   category: z.string().trim().min(2, "Category is required").max(50, "Category is too long"),
   imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
+
+const editableFields = ["title", "description", "price", "stock", "category", "imageUrl"] as const;
+
+const editFieldSchemas = {
+  title: productSchema.shape.title,
+  description: productSchema.shape.description,
+  price: productSchema.shape.price,
+  stock: productSchema.shape.stock,
+  category: productSchema.shape.category,
+  imageUrl: productSchema.shape.imageUrl,
+};
 
 export type ProductFormValues = {
   title: string;
@@ -63,9 +74,12 @@ const defaultValues: ProductFormValues = {
 
 export function ProductForm({ mode, productId, initialValues }: ProductFormProps) {
   const router = useRouter();
-  const [values, setValues] = useState<ProductFormValues>({
+  const baseValues: ProductFormValues = {
     ...defaultValues,
     ...initialValues,
+  };
+  const [values, setValues] = useState<ProductFormValues>({
+    ...baseValues,
   });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
@@ -73,6 +87,20 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string | null>(initialValues?.imageUrl ?? null);
+
+  useEffect(() => {
+    if (mode !== "edit") {
+      return;
+    }
+
+    const nextValues: ProductFormValues = {
+      ...defaultValues,
+      ...initialValues,
+    };
+
+    setValues(nextValues);
+    setPreviewSrc(nextValues.imageUrl || null);
+  }, [mode, initialValues]);
 
   const heading = mode === "create" ? "Create product" : "Edit product";
 
@@ -157,25 +185,63 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
       return;
     }
 
-    const validation = productSchema.safeParse(values);
+    let payload: Record<string, unknown> = {};
 
-    if (!validation.success) {
-      const nextErrors: FieldErrors = {};
-      for (const issue of validation.error.issues) {
-        const fieldName = issue.path[0];
-        if (
-          fieldName === "title" ||
-          fieldName === "description" ||
-          fieldName === "price" ||
-          fieldName === "stock" ||
-          fieldName === "category" ||
-          fieldName === "imageUrl"
-        ) {
-          nextErrors[fieldName] = issue.message;
+    if (mode === "create") {
+      const validation = productSchema.safeParse(values);
+
+      if (!validation.success) {
+        const nextErrors: FieldErrors = {};
+        for (const issue of validation.error.issues) {
+          const fieldName = issue.path[0];
+          if (
+            fieldName === "title" ||
+            fieldName === "description" ||
+            fieldName === "price" ||
+            fieldName === "stock" ||
+            fieldName === "category" ||
+            fieldName === "imageUrl"
+          ) {
+            nextErrors[fieldName] = issue.message;
+          }
         }
+        setFieldErrors(nextErrors);
+        return;
       }
-      setFieldErrors(nextErrors);
-      return;
+
+      payload = {
+        title: validation.data.title,
+        description: validation.data.description,
+        price: validation.data.price,
+        stock: validation.data.stock,
+        category: validation.data.category,
+        imageUrl: validation.data.imageUrl || undefined,
+      };
+    } else {
+      const changedFields = editableFields.filter((field) => values[field] !== baseValues[field]);
+
+      if (changedFields.length === 0) {
+        setFormError("Update at least one field before saving.");
+        return;
+      }
+
+      const nextErrors: FieldErrors = {};
+
+      for (const field of changedFields) {
+        const parsed = editFieldSchemas[field].safeParse(values[field]);
+
+        if (!parsed.success) {
+          nextErrors[field] = parsed.error.issues[0]?.message ?? "Invalid value";
+          continue;
+        }
+
+        payload[field] = field === "imageUrl" ? parsed.data || null : parsed.data;
+      }
+
+      if (Object.keys(nextErrors).length > 0) {
+        setFieldErrors(nextErrors);
+        return;
+      }
     }
 
     setFieldErrors({});
@@ -189,14 +255,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title: validation.data.title,
-          description: validation.data.description,
-          price: validation.data.price,
-          stock: validation.data.stock,
-          category: validation.data.category,
-          imageUrl: validation.data.imageUrl || undefined,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = (await response.json()) as ProductApiResponse;
@@ -246,7 +305,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="title"
               onChange={(e) => updateField("title", e.target.value)}
-              required
+              required={mode === "create"}
               value={values.title}
             />
             {fieldErrors.title && <p className={styles.error}>{fieldErrors.title}</p>}
@@ -260,7 +319,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="category"
               onChange={(e) => updateField("category", e.target.value)}
-              required
+              required={mode === "create"}
               value={values.category}
             />
             {fieldErrors.category && <p className={styles.error}>{fieldErrors.category}</p>}
@@ -276,7 +335,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               inputMode="decimal"
               min="0.01"
               onChange={(e) => updateField("price", e.target.value)}
-              required
+              required={mode === "create"}
               step="0.01"
               type="number"
               value={values.price}
@@ -294,7 +353,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               inputMode="numeric"
               min="0"
               onChange={(e) => updateField("stock", e.target.value)}
-              required
+              required={mode === "create"}
               step="1"
               type="number"
               value={values.stock}
@@ -310,7 +369,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="description"
               onChange={(e) => updateField("description", e.target.value)}
-              required
+              required={mode === "create"}
               value={values.description}
             />
             {fieldErrors.description && <p className={styles.error}>{fieldErrors.description}</p>}

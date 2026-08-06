@@ -16,7 +16,11 @@ export function orderNumberFromId(orderId: string) {
   return `ORD-${orderId.replace(/[^a-zA-Z0-9]/g, "").slice(-8).toUpperCase()}`;
 }
 
-export function paymentLabel(method: PaymentMethod) {
+export function paymentLabel(method?: PaymentMethod) {
+  if (!method) {
+    return "Not provided";
+  }
+
   if (method === "PAYPAL") {
     return "PayPal";
   }

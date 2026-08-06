@@ -10,7 +10,6 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
   const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState<OrderRecord | null>(null);
-  const [mode, setMode] = useState<"api" | "local">("local");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -26,8 +25,6 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
         if (!isMounted) {
           return;
         }
-
-        setMode(result.mode);
 
         if (!result.order) {
           setError("Order not found.");
@@ -84,10 +81,6 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
             <p className={styles.lead}>Track the order summary, shipment status, and line items.</p>
           </header>
 
-          {mode === "local" ? (
-            <p className={styles.info}>This order is currently loaded from local frontend storage.</p>
-          ) : null}
-
           <div className={styles.layout}>
             <Card className={styles.detailsCard}>
               <span className={styles.statusPill}>{statusLabel(order.status)}</span>
@@ -103,17 +96,19 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 </div>
                 <div className={styles.metaRow}>
                   <dt>Ship to</dt>
-                  <dd>{order.shipping.fullName}</dd>
+                  <dd>{order.shipping?.fullName || "Not provided"}</dd>
                 </div>
                 <div className={styles.metaRow}>
                   <dt>Address</dt>
                   <dd>
-                    {order.shipping.addressLine1}, {order.shipping.city}, {order.shipping.state} {order.shipping.postalCode}
+                    {order.shipping
+                      ? `${order.shipping.addressLine1}, ${order.shipping.city}, ${order.shipping.state} ${order.shipping.postalCode}`
+                      : "Not provided"}
                   </dd>
                 </div>
                 <div className={styles.metaRow}>
                   <dt>Country</dt>
-                  <dd>{order.shipping.country}</dd>
+                  <dd>{order.shipping?.country || "Not provided"}</dd>
                 </div>
               </dl>
 

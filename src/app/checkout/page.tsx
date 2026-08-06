@@ -50,7 +50,7 @@ function validateShipping(shipping: ShippingAddress): FieldErrors {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, itemCount, subtotal, syncMode, clearCart, isMutating } = useCart();
+  const { items, itemCount, subtotal, clearCart, isMutating } = useCart();
 
   const [shipping, setShipping] = useState<ShippingAddress>(defaultShipping);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CARD");
@@ -96,7 +96,6 @@ export default function CheckoutPage() {
         items,
         paymentMethod,
         shipping,
-        sourceMode: syncMode,
       });
 
       await clearCart();
@@ -142,12 +141,6 @@ export default function CheckoutPage() {
             </div>
             <p className={styles.lead}>Fill in your shipping details and confirm the order summary.</p>
           </header>
-
-          {syncMode === "local" ? (
-            <p className={styles.info}>
-              Checkout is running in frontend mode while backend order APIs are in progress.
-            </p>
-          ) : null}
 
           {formMessage ? <p className={styles.info}>{formMessage}</p> : null}
 

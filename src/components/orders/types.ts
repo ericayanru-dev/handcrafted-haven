@@ -1,4 +1,4 @@
-import type { CartItem, CartSyncMode } from "@/components/cart/cart-types";
+import type { CartItem } from "@/components/cart/cart-types";
 
 export type OrderStatus =
   | "PLACED"
@@ -28,21 +28,20 @@ export type OrderRecord = {
   id: string;
   createdAt: string;
   status: OrderStatus;
-  paymentMethod: PaymentMethod;
-  shipping: ShippingAddress;
+  paymentMethod?: PaymentMethod;
+  shipping?: ShippingAddress;
   items: CartItem[];
   itemCount: number;
   subtotal: number;
   tax: number;
   total: number;
-  sourceMode: CartSyncMode;
+  sourceMode: "api";
 };
 
 export type CreateOrderInput = {
   items: CartItem[];
   paymentMethod: PaymentMethod;
   shipping: ShippingAddress;
-  sourceMode: CartSyncMode;
 };
 
 export type OrdersResponse = {
