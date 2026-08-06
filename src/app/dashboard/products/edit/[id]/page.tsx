@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Button, Card, Container } from "@/components/ui";
 import { Loading } from "@/components/state/loading";
 import { ProductForm, type ProductFormValues } from "@/components/product/product-form";
@@ -21,7 +21,8 @@ type ProductDetailsResponse = {
   error?: string;
 };
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
@@ -36,7 +37,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       setNotFound(false);
 
       try {
-        const response = await fetch(`/api/product/get-product/${params.id}`);
+        const response = await fetch(`/api/product/get-product/${id}`);
         const result = (await response.json()) as ProductDetailsResponse;
 
         if (!isMounted) {
@@ -77,7 +78,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     return () => {
       isMounted = false;
     };
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return <Loading message="Loading product editor..." title="Edit product" />;
@@ -91,7 +92,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             <p className={styles.eyebrow}>Edit product</p>
             <h1 className={styles.title}>Product not found</h1>
             <div className={styles.actions}>
-              <Button href="/products">Back to products</Button>
+              <Button href="/dashboard/products">Back to my products</Button>
             </div>
           </Card>
         </Container>
@@ -106,7 +107,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           <Card className={styles.section}>
             <p className={styles.error}>{error}</p>
             <div className={styles.actions}>
-              <Button href="/products">Back to products</Button>
+              <Button href="/dashboard/products">Back to my products</Button>
             </div>
           </Card>
         </Container>
@@ -126,7 +127,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             <p className={styles.lead}>Change product details and save updates to your listing.</p>
           </div>
 
-          <ProductForm initialValues={initialValues} mode="edit" productId={params.id} />
+          <ProductForm initialValues={initialValues} mode="edit" productId={id} />
         </div>
       </Container>
     </main>

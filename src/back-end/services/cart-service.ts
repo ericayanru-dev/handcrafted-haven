@@ -180,7 +180,7 @@ export class CartService {
           status: 404,
         };
       }
-console.log("Removing item from cart:", cart);
+
       await cartModel.removeItem(cart.id, validation.data.productId);
 
       return {

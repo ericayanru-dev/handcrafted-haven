@@ -11,6 +11,7 @@ type DashboardLink = {
 const links: DashboardLink[] = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/seller-profile", label: "Seller profile" },
+  { href: "/dashboard/products", label: "My products" },
   { href: "/dashboard/products/create", label: "Add product" },
   { href: "/orders", label: "Orders" },
 ];

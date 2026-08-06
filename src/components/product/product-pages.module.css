@@ -131,12 +131,29 @@
   gap: var(--space-2);
 }
 
+.cardActionsStack {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.metaList {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
 .status {
   border: 1px dashed var(--border);
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.72);
   padding: 1rem;
   color: var(--text-secondary);
+}
+
+.statusCard {
+  display: grid;
+  gap: var(--space-4);
 }
 
 .error {

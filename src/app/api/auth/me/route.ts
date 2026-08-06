@@ -30,15 +30,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    
-    // 4. Check if account is active
-    {/*if (user.status !== 'ACTIVE') {
-      return NextResponse.json(
-        { success: false, error: 'Account is inactive' },
-        { status: 403 }
-      );
-    }*/}
-
     return NextResponse.json({
       success: true,
       user

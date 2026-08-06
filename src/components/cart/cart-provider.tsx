@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useToast } from "@/components/state/toast-provider";
 import {
   addCartItem,
   clearCartItems,
@@ -27,6 +28,7 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { showToast } = useToast();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
@@ -69,11 +71,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setSyncMode(result.mode);
       if (result.message) {
         setMessage(result.message);
+        showToast({
+          title: result.mode === "api" ? "Cart updated" : "Saved locally",
+          message: result.message,
+          tone: result.mode === "api" ? "success" : "info",
+        });
       }
     } finally {
       setIsMutating(false);
     }
-  }, []);
+  }, [showToast]);
 
   const addToCart = useCallback(
     async (input: AddCartItemInput) => {
