@@ -9,7 +9,7 @@ const highlights = [
   },
   {
     title: "Inline errors",
-    text: "Validation and backend errors show up right in the form.",
+    text: "If anything needs your attention, we show it right in the form.",
   },
   {
     title: "Uses the same pieces",

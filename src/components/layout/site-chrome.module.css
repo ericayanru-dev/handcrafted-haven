@@ -78,6 +78,10 @@
   cursor: pointer;
 }
 
+.menuButtonVisible {
+  display: none;
+}
+
 .menuIcon {
   display: grid;
   gap: 0.18rem;
@@ -96,7 +100,7 @@
 }
 
 .mobilePanelOpen {
-  display: block;
+  display: none;
 }
 
 .mobileNav {
@@ -173,6 +177,14 @@
 
   .menuButton {
     display: inline-flex;
+  }
+
+  .menuButtonVisible {
+    display: inline-flex;
+  }
+
+  .mobilePanelOpen {
+    display: block;
   }
 
   .footerInner {
