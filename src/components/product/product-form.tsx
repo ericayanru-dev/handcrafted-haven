@@ -77,8 +77,10 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   const heading = mode === "create" ? "Create product" : "Edit product";
 
   const endpoint = useMemo(() => {
-    return mode === "create" ? "../../api/product/create" : `../../api/product/create${productId}`;
+    return mode === "create" ? "/api/product/create" : `/api/product/edit/${productId}`;
   }, [mode, productId]);
+
+  const cancelHref = "/dashboard/products";
 
   function updateField(field: keyof ProductFormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -213,7 +215,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         return;
       }
 
-      router.push("/products");
+      router.push("/dashboard/products");
       router.refresh();
     } catch {
       setFormError("Could not save product right now. Please try again.");
@@ -357,12 +359,12 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
             {isUploading
               ? "Uploading image..."
               : isSubmitting
-                ? "Saving..."
-                : mode === "create"
-                  ? "Create product"
-                  : "Save product"}
+              ? "Saving..."
+              : mode === "create"
+                ? "Create product"
+                : "Save product"}
           </Button>
-          <Button href="/products" variant="secondary">
+          <Button href={cancelHref} variant="secondary">
             Cancel
           </Button>
         </div>

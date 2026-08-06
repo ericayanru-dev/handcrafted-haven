@@ -1,14 +1,45 @@
 import type { AddCartItemInput, CartItem, CartMutationResult, CartSnapshot } from "./cart-types";
 
 const CART_STORAGE_KEY = "handcrafted-haven-cart-v1";
-const CART_API_BASE = "/api/cart";
-const CART_API_ENABLED = process.env.NEXT_PUBLIC_ENABLE_CART_API === "1";
+const CART_API_ENABLED = process.env.NEXT_PUBLIC_ENABLE_CART_API !== "0";
 
 type CartApiResponse = {
   success?: boolean;
-  data?: {
-    items?: CartItem[];
-  };
+  data?:
+    | {
+        id?: string;
+        items?: Array<{
+          id?: string;
+          productId: string;
+          quantity: number;
+          product?: {
+            title?: string;
+            price?: number | string;
+            imageUrl?: string | null;
+            category?: string | null;
+            seller?: {
+              storeName?: string | null;
+            };
+          };
+          lineTotal?: number;
+        }>;
+        itemCount?: number;
+        subtotal?: number;
+      }
+    | {
+        id?: string;
+        productId: string;
+        quantity: number;
+        product?: {
+          title?: string;
+          price?: number | string;
+          imageUrl?: string | null;
+          category?: string | null;
+          seller?: {
+            storeName?: string | null;
+          };
+        };
+      };
   message?: string;
   error?: string;
 };
@@ -103,7 +134,7 @@ function clearLocalItems() {
 }
 
 async function fetchCartEndpoint(path: string, init?: RequestInit) {
-  const response = await fetch(`${CART_API_BASE}${path}`, {
+  const response = await fetch(path, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -125,9 +156,36 @@ async function fetchCartEndpoint(path: string, init?: RequestInit) {
   return payload;
 }
 
-function fromApi(payload: CartApiResponse): CartSnapshot {
+function fromApiItem(item: {
+  productId: string;
+  quantity: number;
+  product?: {
+    title?: string;
+    price?: number | string;
+    imageUrl?: string | null;
+    category?: string | null;
+    seller?: {
+      storeName?: string | null;
+    };
+  };
+}): CartItem {
   return {
-    items: normalizeItems(payload.data?.items ?? []),
+    productId: item.productId,
+    title: item.product?.title ?? "Cart item",
+    price: Number(item.product?.price) || 0,
+    quantity: Math.max(1, Number(item.quantity) || 1),
+    imageUrl: item.product?.imageUrl ?? null,
+    category: item.product?.category ?? undefined,
+    storeName: item.product?.seller?.storeName ?? undefined,
+    stock: undefined,
+  };
+}
+
+function fromApi(payload: CartApiResponse): CartSnapshot {
+  const items = payload.data && "items" in payload.data ? payload.data.items ?? [] : [];
+
+  return {
+    items: normalizeItems(items.map(fromApiItem)),
     mode: "api",
   };
 }
@@ -141,7 +199,7 @@ export async function loadCart(): Promise<CartSnapshot> {
   }
 
   try {
-    const payload = await fetchCartEndpoint("");
+    const payload = await fetchCartEndpoint("/api/cart/get");
     return fromApi(payload);
   } catch {
     return {
@@ -161,11 +219,19 @@ export async function addCartItem(input: AddCartItemInput): Promise<CartMutation
   }
 
   try {
-    const payload = await fetchCartEndpoint("/items", {
+    await fetchCartEndpoint("/api/cart/add", {
       method: "POST",
-      body: JSON.stringify(input),
+      body: JSON.stringify({
+        productId: input.productId,
+        quantity: input.quantity ?? 1,
+      }),
     });
-    return fromApi(payload);
+
+    const snapshot = await loadCart();
+    return {
+      ...snapshot,
+      message: "Item added to cart.",
+    };
   } catch {
     return {
       items: upsertLocalItem(input),
@@ -185,11 +251,16 @@ export async function setCartItemQuantity(productId: string, quantity: number): 
   }
 
   try {
-    const payload = await fetchCartEndpoint(`/items/${productId}`, {
+    await fetchCartEndpoint("/api/cart/update", {
       method: "PATCH",
-      body: JSON.stringify({ quantity }),
+      body: JSON.stringify({ productId, quantity }),
     });
-    return fromApi(payload);
+
+    const snapshot = await loadCart();
+    return {
+      ...snapshot,
+      message: "Cart updated.",
+    };
   } catch {
     return {
       items: updateLocalQuantity(productId, quantity),
@@ -209,10 +280,16 @@ export async function removeCartItem(productId: string): Promise<CartMutationRes
   }
 
   try {
-    const payload = await fetchCartEndpoint(`/items/${productId}`, {
+    await fetchCartEndpoint("/api/cart/remove", {
       method: "DELETE",
+      body: JSON.stringify({ productId }),
     });
-    return fromApi(payload);
+
+    const snapshot = await loadCart();
+    return {
+      ...snapshot,
+      message: "Item removed from cart.",
+    };
   } catch {
     return {
       items: removeLocalItem(productId),
@@ -232,10 +309,15 @@ export async function clearCartItems(): Promise<CartMutationResult> {
   }
 
   try {
-    const payload = await fetchCartEndpoint("", {
+    await fetchCartEndpoint("/api/cart/clear", {
       method: "DELETE",
     });
-    return fromApi(payload);
+
+    const snapshot = await loadCart();
+    return {
+      ...snapshot,
+      message: "Cart cleared.",
+    };
   } catch {
     return {
       items: clearLocalItems(),

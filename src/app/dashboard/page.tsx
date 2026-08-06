@@ -360,7 +360,8 @@ export default function SellerDashboardPage() {
               </div>
 
               <div className={styles.actions}>
-                <Button href="/dashboard/products/create">Add product</Button>
+                <Button href="/dashboard/products">My products</Button>
+                <Button href="/dashboard/products/create" variant="secondary">Add product</Button>
                 <Button href="/dashboard/seller-profile/edit" variant="secondary">
                   Edit profile
                 </Button>

@@ -1,6 +1,15 @@
 import type { CartItem, CartSyncMode } from "@/components/cart/cart-types";
 
-export type OrderStatus = "PLACED" | "PROCESSING" | "SHIPPED" | "DELIVERED";
+export type OrderStatus =
+  | "PLACED"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "PENDING"
+  | "PAID"
+  | "FAILED"
+  | "CANCELLED"
+  | "COMPLETED";
 
 export type ShippingAddress = {
   fullName: string;
@@ -38,10 +47,13 @@ export type CreateOrderInput = {
 
 export type OrdersResponse = {
   success?: boolean;
-  data?: {
-    order?: OrderRecord;
-    orders?: OrderRecord[];
-  };
+  data?:
+    | {
+        order?: OrderRecord;
+        orders?: OrderRecord[];
+      }
+    | OrderRecord
+    | OrderRecord[];
   message?: string;
   error?: string;
 };

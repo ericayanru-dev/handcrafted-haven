@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { formatCurrency, formatDate, loadOrderById, orderNumberFromId, paymentLabel, statusLabel, type OrderRecord } from "@/components/orders";
 import { Loading } from "@/components/state/loading";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
 
-export default function OrderDetailsPage({ params }: { params: { id: string } }) {
+export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState<OrderRecord | null>(null);
   const [mode, setMode] = useState<"api" | "local">("local");
@@ -20,7 +21,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
       setError("");
 
       try {
-        const result = await loadOrderById(params.id);
+        const result = await loadOrderById(id);
 
         if (!isMounted) {
           return;
@@ -50,7 +51,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
     return () => {
       isMounted = false;
     };
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return <Loading message="Loading order details..." title="Order details" />;

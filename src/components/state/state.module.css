@@ -3,6 +3,10 @@
   padding: var(--space-8) 0;
 }
 
+.frameFull {
+  width: 100%;
+}
+
 .shell {
   display: grid;
   gap: var(--space-4);
@@ -11,7 +15,8 @@
 }
 
 .loadingCard,
-.errorCard {
+.errorCard,
+.emptyCard {
   display: grid;
   gap: var(--space-4);
   width: min(100%, 42rem);
@@ -52,15 +57,112 @@
   border-left: 4px solid var(--error);
 }
 
+.emptyTone {
+  border-left: 4px solid rgba(14, 116, 144, 0.28);
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
 }
 
+.emptyEyebrow {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.emptyTitle {
+  color: var(--text-primary);
+  font-family: var(--font-heading), sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.15;
+}
+
+.emptyText {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.skeletonStack {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.skeletonRow {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.skeletonBlock {
+  border-radius: 0.9rem;
+  background: linear-gradient(90deg, rgba(226, 232, 240, 0.5) 0%, rgba(241, 245, 249, 0.95) 45%, rgba(226, 232, 240, 0.5) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+
+.skeletonCard {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.toastViewport {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 40;
+  display: grid;
+  gap: 0.75rem;
+  width: min(100vw - 2rem, 24rem);
+}
+
+.toast {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow-card);
+  padding: 0.9rem 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.toastTitle {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.toastText {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.toastSuccess {
+  border-color: rgba(46, 125, 50, 0.24);
+}
+
+.toastError {
+  border-color: rgba(185, 28, 28, 0.24);
+}
+
+.toastInfo {
+  border-color: rgba(14, 116, 144, 0.24);
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }
 
@@ -77,5 +179,11 @@
   .actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .toastViewport {
+    left: 1rem;
+    right: 1rem;
+    width: auto;
   }
 }

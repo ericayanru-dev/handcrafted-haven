@@ -27,6 +27,9 @@ export function paymentLabel(method: PaymentMethod) {
 }
 
 export function statusLabel(status: OrderStatus) {
+  if (status === "PLACED") {
+    return "Placed";
+  }
   if (status === "PROCESSING") {
     return "Processing";
   }
@@ -35,6 +38,21 @@ export function statusLabel(status: OrderStatus) {
   }
   if (status === "DELIVERED") {
     return "Delivered";
+  }
+  if (status === "PENDING") {
+    return "Pending";
+  }
+  if (status === "PAID") {
+    return "Paid";
+  }
+  if (status === "FAILED") {
+    return "Failed";
+  }
+  if (status === "CANCELLED") {
+    return "Cancelled";
+  }
+  if (status === "COMPLETED") {
+    return "Completed";
   }
   return "Placed";
 }
