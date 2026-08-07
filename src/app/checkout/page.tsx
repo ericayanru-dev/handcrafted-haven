@@ -3,7 +3,12 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart";
-import { createOrder, formatCurrency, type PaymentMethod, type ShippingAddress } from "@/components/orders";
+import {
+  createOrder,
+  formatCurrency,
+  type PaymentMethod,
+  type ShippingAddress,
+} from "@/components/orders";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
 
@@ -140,7 +145,9 @@ export default function CheckoutPage() {
               <p className={styles.eyebrow}>Checkout</p>
               <h1 className={styles.title}>Place your order</h1>
             </div>
-            <p className={styles.lead}>Fill in your shipping details and confirm the order summary.</p>
+            <p className={styles.lead}>
+              Fill in your shipping details and confirm the order summary.
+            </p>
           </header>
 
           {syncMode === "local" ? (
@@ -162,7 +169,9 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("fullName", event.target.value)}
                     value={shipping.fullName}
                   />
-                  {fieldErrors.fullName ? <p className={styles.error}>{fieldErrors.fullName}</p> : null}
+                  {fieldErrors.fullName ? (
+                    <p className={styles.error}>{fieldErrors.fullName}</p>
+                  ) : null}
                 </label>
 
                 <label className={styles.fieldGroup} htmlFor="email">
@@ -177,7 +186,10 @@ export default function CheckoutPage() {
                   {fieldErrors.email ? <p className={styles.error}>{fieldErrors.email}</p> : null}
                 </label>
 
-                <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="addressLine1">
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="addressLine1"
+                >
                   <span className={styles.fieldLabel}>Address line 1</span>
                   <input
                     className={styles.field}
@@ -185,10 +197,15 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("addressLine1", event.target.value)}
                     value={shipping.addressLine1}
                   />
-                  {fieldErrors.addressLine1 ? <p className={styles.error}>{fieldErrors.addressLine1}</p> : null}
+                  {fieldErrors.addressLine1 ? (
+                    <p className={styles.error}>{fieldErrors.addressLine1}</p>
+                  ) : null}
                 </label>
 
-                <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="addressLine2">
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="addressLine2"
+                >
                   <span className={styles.fieldLabel}>Address line 2 (optional)</span>
                   <input
                     className={styles.field}
@@ -228,7 +245,9 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("postalCode", event.target.value)}
                     value={shipping.postalCode}
                   />
-                  {fieldErrors.postalCode ? <p className={styles.error}>{fieldErrors.postalCode}</p> : null}
+                  {fieldErrors.postalCode ? (
+                    <p className={styles.error}>{fieldErrors.postalCode}</p>
+                  ) : null}
                 </label>
 
                 <label className={styles.fieldGroup} htmlFor="country">
@@ -239,10 +258,15 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("country", event.target.value)}
                     value={shipping.country}
                   />
-                  {fieldErrors.country ? <p className={styles.error}>{fieldErrors.country}</p> : null}
+                  {fieldErrors.country ? (
+                    <p className={styles.error}>{fieldErrors.country}</p>
+                  ) : null}
                 </label>
 
-                <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="paymentMethod">
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="paymentMethod"
+                >
                   <span className={styles.fieldLabel}>Payment method</span>
                   <select
                     className={styles.select}
@@ -256,7 +280,9 @@ export default function CheckoutPage() {
                   </select>
                 </label>
 
-                {formError ? <p className={`${styles.error} ${styles.fieldGroupFull}`}>{formError}</p> : null}
+                {formError ? (
+                  <p className={`${styles.error} ${styles.fieldGroupFull}`}>{formError}</p>
+                ) : null}
 
                 <div className={`${styles.actions} ${styles.fieldGroupFull}`}>
                   <Button disabled={isSubmitting || isMutating} type="submit">

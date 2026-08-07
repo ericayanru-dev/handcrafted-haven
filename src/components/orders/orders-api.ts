@@ -142,7 +142,9 @@ async function fetchOrdersEndpoint(path: string, init?: RequestInit) {
   }
 
   if (!response.ok || !payload.success) {
-    throw new Error(payload.message ?? payload.error ?? `Orders request failed (${response.status})`);
+    throw new Error(
+      payload.message ?? payload.error ?? `Orders request failed (${response.status})`,
+    );
   }
 
   return payload;
@@ -177,9 +179,14 @@ function normalizeApiStatus(status?: string): OrderRecord["status"] {
   }
 }
 
-function normalizeApiOrder(order: ApiOrderRecord, metadata?: StoredOrderMetadata | null): OrderRecord {
+function normalizeApiOrder(
+  order: ApiOrderRecord,
+  metadata?: StoredOrderMetadata | null,
+): OrderRecord {
   const items = normalizeApiItems(order.items);
-  const subtotal = metadata?.subtotal ?? clampMoney(items.reduce((sum, item) => sum + item.price * item.quantity, 0));
+  const subtotal =
+    metadata?.subtotal ??
+    clampMoney(items.reduce((sum, item) => sum + item.price * item.quantity, 0));
   const total = clampMoney(Number(order.total) || metadata?.total || subtotal);
   const tax = metadata?.tax ?? clampMoney(total - subtotal);
 
@@ -188,18 +195,16 @@ function normalizeApiOrder(order: ApiOrderRecord, metadata?: StoredOrderMetadata
     createdAt: order.createdAt || new Date().toISOString(),
     status: normalizeApiStatus(order.status),
     paymentMethod: metadata?.paymentMethod ?? "CARD",
-    shipping:
-      metadata?.shipping ??
-      {
-        fullName: "Order customer",
-        email: "",
-        addressLine1: "",
-        addressLine2: "",
-        city: "",
-        state: "",
-        postalCode: "",
-        country: "",
-      },
+    shipping: metadata?.shipping ?? {
+      fullName: "Order customer",
+      email: "",
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "",
+    },
     items,
     itemCount: items.reduce((sum, item) => sum + Math.max(1, item.quantity), 0),
     subtotal,
@@ -241,8 +246,12 @@ function extractOrders(payload: OrdersResponse): ApiOrderRecord[] {
   return [];
 }
 
-export async function createOrder(input: CreateOrderInput): Promise<{ order: OrderRecord; mode: "api" | "local"; message?: string }> {
-  const subtotal = clampMoney(input.items.reduce((sum, item) => sum + item.price * item.quantity, 0));
+export async function createOrder(
+  input: CreateOrderInput,
+): Promise<{ order: OrderRecord; mode: "api" | "local"; message?: string }> {
+  const subtotal = clampMoney(
+    input.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+  );
   const tax = clampMoney(subtotal * 0.07);
   const total = clampMoney(subtotal + tax);
 
@@ -304,7 +313,10 @@ export async function createOrder(input: CreateOrderInput): Promise<{ order: Ord
   }
 }
 
-export async function loadOrderHistory(): Promise<{ orders: OrderRecord[]; mode: "api" | "local" }> {
+export async function loadOrderHistory(): Promise<{
+  orders: OrderRecord[];
+  mode: "api" | "local";
+}> {
   if (!ORDERS_API_ENABLED) {
     return {
       orders: readLocalOrders(),
@@ -327,7 +339,9 @@ export async function loadOrderHistory(): Promise<{ orders: OrderRecord[]; mode:
   }
 }
 
-export async function loadOrderById(orderId: string): Promise<{ order: OrderRecord | null; mode: "api" | "local" }> {
+export async function loadOrderById(
+  orderId: string,
+): Promise<{ order: OrderRecord | null; mode: "api" | "local" }> {
   if (!ORDERS_API_ENABLED) {
     const local = readLocalOrders().find((order) => order.id === orderId) ?? null;
     return {
@@ -337,7 +351,9 @@ export async function loadOrderById(orderId: string): Promise<{ order: OrderReco
   }
 
   try {
-    const payload = await fetchOrdersEndpoint(`/api/orders/get-order/${orderId}`, { method: "GET" });
+    const payload = await fetchOrdersEndpoint(`/api/orders/get-order/${orderId}`, {
+      method: "GET",
+    });
     const order = extractOrder(payload);
     return {
       order: order ? normalizeApiOrder(order, getOrderMetadata(orderId)) : null,
