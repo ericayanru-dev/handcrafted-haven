@@ -6,7 +6,7 @@ import {
   productIdParamSchema,
   getAllProductsQuerySchema,
 } from "@/back-end/lib/validation/product-validations";
-import { formatZodError } from "@/back-end/lib/utils/helper";
+import { formatZodError, deleteBlobFile } from "@/back-end/lib/utils/helper";
 
 import type { ProductsQuerySchema, Product, UpdateProductInput } from "../types/product-types";
 
@@ -200,6 +200,13 @@ export class ProductService {
       }
 
       const updated = await productModel.update(idValidation.data.id, bodyValidation.data);
+      // If image was replaced, delete the old one
+      const newImageUrl = bodyValidation.data.imageUrl;
+      const oldImageUrl = product.imageUrl;
+
+      if (newImageUrl && oldImageUrl && newImageUrl !== oldImageUrl) {
+        await deleteBlobFile(oldImageUrl);
+      }
 
       return {
         success: true,
@@ -249,6 +256,9 @@ export class ProductService {
           message: "You are not authorized to delete this product",
           status: 403,
         };
+      }
+      if (product.imageUrl) {
+        await deleteBlobFile(product.imageUrl);
       }
 
       await productModel.delete(validation.data.id);

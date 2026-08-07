@@ -82,8 +82,6 @@ export class AuthService {
         return { success: false, error: "Invalid email or password." };
       }
 
-      console.log("User found:", user);
-
       {
         /*if (!user.emailVerified) {
         // Generate fresh verification token

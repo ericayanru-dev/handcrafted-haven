@@ -42,8 +42,8 @@ export default function Home() {
           <p className={styles.eyebrow}>WDD 430 Group Project</p>
           <h1>Shop handmade goods from real makers in one place.</h1>
           <p>
-            This is the starting page for Handcrafted Haven. It gives us a place to show products,
-            browse categories, and add seller profiles and reviews.
+            Handcrafted Haven is where shoppers can browse products, compare categories, and connect
+            with makers through seller profiles and reviews.
           </p>
           <div className={styles.ctas}>
             <Button href="#featured">Explore Products</Button>
@@ -59,10 +59,10 @@ export default function Home() {
           <div className={styles.sectionHeader}>
             <div>
               <p className={styles.eyebrow}>Featured products</p>
-              <h2>Some of the pieces we want to show first.</h2>
+              <h2>Featured pieces from local makers.</h2>
             </div>
             <p className={styles.sectionLead}>
-              These cards are a starting point. Real product data can go here later.
+              A quick look at the types of handmade products shoppers can find in the marketplace.
             </p>
           </div>
 
@@ -86,7 +86,7 @@ export default function Home() {
               <h2>Easy browsing paths for shoppers.</h2>
             </div>
             <p className={styles.sectionLead}>
-              These blocks leave room for filters, sorting, and fuller product views later on.
+              Categories help buyers narrow results before they open full product details.
             </p>
           </div>
 
@@ -126,20 +126,23 @@ export default function Home() {
             <div className={styles.ctaContent}>
               <div>
                 <p className={styles.eyebrow}>Next steps</p>
-                <h2>Keep building from this starting point.</h2>
+                <h2>Keep building the marketplace experience.</h2>
               </div>
               <p className={styles.sectionLead}>
-                Later we can connect auth, live product data, and the seller dashboard without
-                changing the layout again.
+                The current layout supports live data, account flows, and seller tools without a full
+                page redesign.
               </p>
             </div>
 
             <div className={styles.ctas}>
+              <Button href="/marketplace" variant="secondary">
+                Browse marketplace
+              </Button>
               <Button href="/register">Create account</Button>
               <Button href="/login" variant="secondary">
                 Sign in
               </Button>
-              <Button href="/seller-profile" variant="ghost">
+              <Button href="/dashboard/seller-profile" variant="ghost">
                 Seller profile
               </Button>
             </div>
