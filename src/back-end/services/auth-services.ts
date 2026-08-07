@@ -82,8 +82,6 @@ export class AuthService {
         return { success: false, error: "Invalid email or password." };
       }
 
-      console.log("User found:", user);
-
       {
         /*if (!user.emailVerified) {
         // Generate fresh verification token
@@ -142,7 +140,7 @@ export class AuthService {
       await tokenRepo.createRefreshToken(
         user.id,
         refreshToken,
-        new Date(Date.now() + AUTH_CONFIG.JWT_REFRESH_EXPIRES_IN_MS),
+        new Date(Date.now() + AUTH_CONFIG.JWT_REFRESH_EXPIRES_IN_MS)
       );
 
       return {
@@ -181,6 +179,4 @@ export class AuthService {
     }
   }
 }
-
-
 export const authService = new AuthService();

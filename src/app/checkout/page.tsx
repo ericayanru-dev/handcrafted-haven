@@ -3,7 +3,16 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart";
+<<<<<<< HEAD
 import { createOrder, formatCurrency, type PaymentMethod, type ShippingAddress } from "@/components/orders";
+=======
+import {
+  createOrder,
+  formatCurrency,
+  type PaymentMethod,
+  type ShippingAddress,
+} from "@/components/orders";
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
 
@@ -50,7 +59,11 @@ function validateShipping(shipping: ShippingAddress): FieldErrors {
 
 export default function CheckoutPage() {
   const router = useRouter();
+<<<<<<< HEAD
   const { items, itemCount, subtotal, clearCart, isMutating } = useCart();
+=======
+  const { items, itemCount, subtotal, syncMode, clearCart, isMutating } = useCart();
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
   const [shipping, setShipping] = useState<ShippingAddress>(defaultShipping);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CARD");
@@ -96,6 +109,10 @@ export default function CheckoutPage() {
         items,
         paymentMethod,
         shipping,
+<<<<<<< HEAD
+=======
+        sourceMode: syncMode,
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       });
 
       await clearCart();
@@ -139,9 +156,23 @@ export default function CheckoutPage() {
               <p className={styles.eyebrow}>Checkout</p>
               <h1 className={styles.title}>Place your order</h1>
             </div>
+<<<<<<< HEAD
             <p className={styles.lead}>Fill in your shipping details and confirm the order summary.</p>
           </header>
 
+=======
+            <p className={styles.lead}>
+              Fill in your shipping details and confirm the order summary.
+            </p>
+          </header>
+
+          {syncMode === "local" ? (
+            <p className={styles.info}>
+              Checkout is running in frontend mode while backend order APIs are in progress.
+            </p>
+          ) : null}
+
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
           {formMessage ? <p className={styles.info}>{formMessage}</p> : null}
 
           <div className={styles.layout}>
@@ -155,7 +186,13 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("fullName", event.target.value)}
                     value={shipping.fullName}
                   />
+<<<<<<< HEAD
                   {fieldErrors.fullName ? <p className={styles.error}>{fieldErrors.fullName}</p> : null}
+=======
+                  {fieldErrors.fullName ? (
+                    <p className={styles.error}>{fieldErrors.fullName}</p>
+                  ) : null}
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
                 </label>
 
                 <label className={styles.fieldGroup} htmlFor="email">
@@ -170,7 +207,14 @@ export default function CheckoutPage() {
                   {fieldErrors.email ? <p className={styles.error}>{fieldErrors.email}</p> : null}
                 </label>
 
+<<<<<<< HEAD
                 <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="addressLine1">
+=======
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="addressLine1"
+                >
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
                   <span className={styles.fieldLabel}>Address line 1</span>
                   <input
                     className={styles.field}
@@ -178,10 +222,22 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("addressLine1", event.target.value)}
                     value={shipping.addressLine1}
                   />
+<<<<<<< HEAD
                   {fieldErrors.addressLine1 ? <p className={styles.error}>{fieldErrors.addressLine1}</p> : null}
                 </label>
 
                 <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="addressLine2">
+=======
+                  {fieldErrors.addressLine1 ? (
+                    <p className={styles.error}>{fieldErrors.addressLine1}</p>
+                  ) : null}
+                </label>
+
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="addressLine2"
+                >
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
                   <span className={styles.fieldLabel}>Address line 2 (optional)</span>
                   <input
                     className={styles.field}
@@ -221,7 +277,13 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("postalCode", event.target.value)}
                     value={shipping.postalCode}
                   />
+<<<<<<< HEAD
                   {fieldErrors.postalCode ? <p className={styles.error}>{fieldErrors.postalCode}</p> : null}
+=======
+                  {fieldErrors.postalCode ? (
+                    <p className={styles.error}>{fieldErrors.postalCode}</p>
+                  ) : null}
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
                 </label>
 
                 <label className={styles.fieldGroup} htmlFor="country">
@@ -232,10 +294,22 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("country", event.target.value)}
                     value={shipping.country}
                   />
+<<<<<<< HEAD
                   {fieldErrors.country ? <p className={styles.error}>{fieldErrors.country}</p> : null}
                 </label>
 
                 <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="paymentMethod">
+=======
+                  {fieldErrors.country ? (
+                    <p className={styles.error}>{fieldErrors.country}</p>
+                  ) : null}
+                </label>
+
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="paymentMethod"
+                >
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
                   <span className={styles.fieldLabel}>Payment method</span>
                   <select
                     className={styles.select}
@@ -249,7 +323,13 @@ export default function CheckoutPage() {
                   </select>
                 </label>
 
+<<<<<<< HEAD
                 {formError ? <p className={`${styles.error} ${styles.fieldGroupFull}`}>{formError}</p> : null}
+=======
+                {formError ? (
+                  <p className={`${styles.error} ${styles.fieldGroupFull}`}>{formError}</p>
+                ) : null}
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
                 <div className={`${styles.actions} ${styles.fieldGroupFull}`}>
                   <Button disabled={isSubmitting || isMutating} type="submit">

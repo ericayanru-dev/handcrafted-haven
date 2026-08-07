@@ -1,30 +1,22 @@
 // src/lib/services/token-service.ts
 
-import {
-  SignJWT,
-  jwtVerify,
-  CompactEncrypt,
-  compactDecrypt,
-  decodeJwt,
-} from "jose";
+import { SignJWT, jwtVerify, CompactEncrypt, compactDecrypt, decodeJwt } from "jose";
 import { randomUUID } from "crypto";
 
-import { TokenPayload } from "../../types/token-types";
+import type { TokenPayload } from "../../types/token-types";
 import { AUTH_CONFIG } from "../../config/auth";
-
 
 const SIGNING_KEY = new TextEncoder().encode(
   AUTH_CONFIG.JWT_SIGNING_SECRET ?? AUTH_CONFIG.JWT_SECRET
 );
 
-const ENCRYPTION_KEY = new TextEncoder().encode(
-  AUTH_CONFIG.JWT_ENCRYPTION_SECRET ?? AUTH_CONFIG.JWT_SECRET
+const ENCRYPTION_KEY = Buffer.from(
+  AUTH_CONFIG.JWT_ENCRYPTION_SECRET ?? AUTH_CONFIG.JWT_SECRET,
+  "base64"
 );
 
 if (ENCRYPTION_KEY.length !== 32) {
-  console.warn(
-    "[TokenService] JWT_ENCRYPTION_SECRET should be exactly 32 bytes for A256GCM."
-  );
+  console.warn("[TokenService] JWT_ENCRYPTION_SECRET should be exactly 32 bytes for A256GCM.");
 }
 
 const ISSUER = "Handcrafted-Haven";
@@ -37,8 +29,6 @@ const AUDIENCE = "Handcrafted-Haven";
  */
 
 export class TokenService {
-
-
   private static async createNestedToken(
     payload: TokenPayload,
     expiresIn: string
@@ -67,9 +57,7 @@ export class TokenService {
      * Encrypt the signed JWT
      */
 
-    const jwe = await new CompactEncrypt(
-      new TextEncoder().encode(signedJwt)
-    )
+    const jwe = await new CompactEncrypt(new TextEncoder().encode(signedJwt))
       .setProtectedHeader({
         alg: "dir",
         enc: "A256GCM",
@@ -88,10 +76,7 @@ export class TokenService {
    */
 
   static signAccessToken(payload: TokenPayload) {
-    return this.createNestedToken(
-      payload,
-      AUTH_CONFIG.JWT_ACCESS_EXPIRES
-    );
+    return this.createNestedToken(payload, AUTH_CONFIG.JWT_ACCESS_EXPIRES);
   }
 
   /**
@@ -101,10 +86,7 @@ export class TokenService {
    */
 
   static signRefreshToken(payload: TokenPayload) {
-    return this.createNestedToken(
-      payload,
-      AUTH_CONFIG.JWT_REFRESH_EXPIRES
-    );
+    return this.createNestedToken(payload, AUTH_CONFIG.JWT_REFRESH_EXPIRES);
   }
 
   /**
@@ -116,18 +98,13 @@ export class TokenService {
    * ------------------------------------------------------------------------
    */
 
-  static async verifyToken(
-    token: string
-  ): Promise<TokenPayload> {
+  static async verifyToken(token: string): Promise<TokenPayload> {
     /**
      * Step 1
      * Decrypt JWE
      */
 
-    const { plaintext } = await compactDecrypt(
-      token,
-      ENCRYPTION_KEY
-    );
+    const { plaintext } = await compactDecrypt(token, ENCRYPTION_KEY);
 
     /**
      * Step 2
@@ -141,14 +118,10 @@ export class TokenService {
      * Verify Signature
      */
 
-    const { payload } = await jwtVerify(
-      signedJwt,
-      SIGNING_KEY,
-      {
-        issuer: ISSUER,
-        audience: AUDIENCE,
-      }
-    );
+    const { payload } = await jwtVerify(signedJwt, SIGNING_KEY, {
+      issuer: ISSUER,
+      audience: AUDIENCE,
+    });
 
     return payload as TokenPayload;
   }
@@ -159,9 +132,7 @@ export class TokenService {
    * ------------------------------------------------------------------------
    */
 
-  static async verifyAccessToken(
-    token: string
-  ): Promise<TokenPayload> {
+  static async verifyAccessToken(token: string): Promise<TokenPayload> {
     const payload = await this.verifyToken(token);
 
     if (payload.type !== "ACCESS") {
@@ -177,9 +148,7 @@ export class TokenService {
    * ------------------------------------------------------------------------
    */
 
-  static async verifyRefreshToken(
-    token: string
-  ): Promise<TokenPayload> {
+  static async verifyRefreshToken(token: string): Promise<TokenPayload> {
     const payload = await this.verifyToken(token);
 
     if (payload.type !== "REFRESH") {
@@ -217,14 +186,9 @@ export class TokenService {
    * ------------------------------------------------------------------------
    */
 
-  static async decodeEncryptedToken(
-    token: string
-  ): Promise<TokenPayload | null> {
+  static async decodeEncryptedToken(token: string): Promise<TokenPayload | null> {
     try {
-      const { plaintext } = await compactDecrypt(
-        token,
-        ENCRYPTION_KEY
-      );
+      const { plaintext } = await compactDecrypt(token, ENCRYPTION_KEY);
 
       const signedJwt = new TextDecoder().decode(plaintext);
 

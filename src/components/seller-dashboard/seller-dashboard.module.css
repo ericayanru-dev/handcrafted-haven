@@ -1,0 +1,244 @@
+.page {
+  padding: var(--space-8) 0;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.title {
+  color: var(--text-primary);
+  font-family: var(--font-heading), sans-serif;
+  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.lead {
+  max-width: 44ch;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.sectionEyebrow {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sectionTitle {
+  color: var(--text-primary);
+  font-family: var(--font-heading), sans-serif;
+  font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+  line-height: 1.15;
+}
+
+.sectionText {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.dashboardNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.dashboardNavLink,
+.dashboardNavLinkActive {
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.dashboardNavLink {
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.dashboardNavLink:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.dashboardNavLinkActive {
+  border: 1px solid rgba(14, 116, 144, 0.25);
+  color: var(--accent);
+  background: rgba(14, 116, 144, 0.1);
+}
+
+.overviewCard {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.overviewTop {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.badges {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  background: rgba(14, 116, 144, 0.08);
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.overviewMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.metricTile {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.82);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.metricLabel {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.metricValue,
+.metricValueSmall {
+  color: var(--text-primary);
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 700;
+}
+
+.metricValue {
+  font-size: 1.6rem;
+}
+
+.metricValueSmall {
+  font-size: 1.1rem;
+}
+
+.metricNote {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.summaryCard {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.status {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.info {
+  border: 1px solid rgba(14, 116, 144, 0.22);
+  background: rgba(14, 116, 144, 0.08);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  line-height: 1.5;
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.listRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--text-secondary);
+  font-size: 0.94rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+@media (max-width: 1100px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .header,
+  .overviewTop {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .lead {
+    max-width: none;
+  }
+
+  .overviewMetrics,
+  .twoColumn {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--space-6) 0;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

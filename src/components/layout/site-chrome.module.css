@@ -1,0 +1,228 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(18px);
+  background: rgba(247, 245, 242, 0.78);
+  border-bottom: 1px solid rgba(217, 221, 229, 0.8);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 4.75rem;
+}
+
+.brandLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-primary);
+  font-family: var(--font-heading), sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.brandMark {
+  display: inline-grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), #7fb9c7);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(14, 116, 144, 0.2);
+}
+
+.navDesktop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navLink,
+.navLinkActive {
+  padding: 0.65rem 0.9rem;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.navLink:hover,
+.navLinkActive {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.navLinkActive {
+  border: 1px solid rgba(14, 116, 144, 0.2);
+}
+
+.navLink:focus-visible,
+.brandLink:focus-visible,
+.menuButton:focus-visible,
+.mobileNavLink:focus-visible,
+.mobileNavLinkActive:focus-visible,
+.footerLink:focus-visible,
+.userPill:focus-visible,
+.cartIcon:focus-visible {
+  outline: 3px solid rgba(14, 116, 144, 0.45);
+  outline-offset: 2px;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userPill {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.48rem 0.75rem;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.menuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.menuIcon {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.menuIcon span {
+  width: 1rem;
+  height: 0.11rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.mobilePanel {
+  display: none;
+  padding: 0 0 var(--space-4);
+}
+
+.mobilePanelOpen {
+  display: block;
+}
+
+.mobileNav {
+  display: grid;
+  gap: 0.35rem;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-card);
+}
+
+.mobileNavLink {
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.mobileNavLinkActive {
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.9rem;
+  color: var(--accent);
+  background: rgba(14, 116, 144, 0.1);
+  font-weight: 700;
+}
+
+.mobileNavLink:hover {
+  background: rgba(14, 116, 144, 0.08);
+}
+
+.mobileNavFooter {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.navError {
+  border: 1px solid rgba(185, 28, 28, 0.22);
+  border-radius: var(--radius-md);
+  background: rgba(185, 28, 28, 0.08);
+  color: var(--error);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 0.75rem 0.85rem;
+}
+
+.footer {
+  margin-top: auto;
+  padding: var(--space-8) 0 var(--space-6);
+  border-top: 1px solid rgba(217, 221, 229, 0.8);
+  background: rgba(247, 245, 242, 0.75);
+}
+
+.footerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.footerText {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.footerLink {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.footerLink:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .navDesktop,
+  .navActions > :not(.menuButton) {
+    display: none;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+
+  .footerInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

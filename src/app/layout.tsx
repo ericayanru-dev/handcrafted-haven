@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins, Source_Sans_3 } from "next/font/google";
+import { CartProvider } from "@/components/cart";
+import { Footer } from "@/components/layout/footer";
+import { Navbar } from "@/components/layout/navbar";
+import { ToastProvider } from "@/components/state/toast-provider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -15,7 +19,10 @@ const sourceSans = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
-  title: "Handcrafted Haven",
+  title: {
+    default: "Handcrafted Haven",
+    template: "%s | Handcrafted Haven",
+  },
   description:
     "A marketplace where artisans showcase and sell handcrafted products.",
 };
@@ -27,7 +34,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.variable} ${sourceSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        <ToastProvider>
+          <CartProvider>
+            <Navbar />
+            {children}
+            <Footer />
+          </CartProvider>
+        </ToastProvider>
+      </body>
     </html>
   );
 }

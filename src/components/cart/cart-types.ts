@@ -20,7 +20,11 @@ export type AddCartItemInput = {
   quantity?: number;
 };
 
+<<<<<<< HEAD
 export type CartSyncMode = "api";
+=======
+export type CartSyncMode = "api" | "local";
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
 export type CartSnapshot = {
   items: CartItem[];

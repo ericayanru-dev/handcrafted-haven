@@ -40,6 +40,9 @@ export type SellerProfileMinAggregateOutputType = {
   storeName: string | null
   bio: string | null
   rating: number | null
+  location: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type SellerProfileMaxAggregateOutputType = {
@@ -48,6 +51,9 @@ export type SellerProfileMaxAggregateOutputType = {
   storeName: string | null
   bio: string | null
   rating: number | null
+  location: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type SellerProfileCountAggregateOutputType = {
@@ -56,6 +62,9 @@ export type SellerProfileCountAggregateOutputType = {
   storeName: number
   bio: number
   rating: number
+  location: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -74,6 +83,9 @@ export type SellerProfileMinAggregateInputType = {
   storeName?: true
   bio?: true
   rating?: true
+  location?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type SellerProfileMaxAggregateInputType = {
@@ -82,6 +94,9 @@ export type SellerProfileMaxAggregateInputType = {
   storeName?: true
   bio?: true
   rating?: true
+  location?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type SellerProfileCountAggregateInputType = {
@@ -90,6 +105,9 @@ export type SellerProfileCountAggregateInputType = {
   storeName?: true
   bio?: true
   rating?: true
+  location?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -185,6 +203,9 @@ export type SellerProfileGroupByOutputType = {
   storeName: string
   bio: string | null
   rating: number | null
+  location: string | null
+  createdAt: Date
+  updatedAt: Date
   _count: SellerProfileCountAggregateOutputType | null
   _avg: SellerProfileAvgAggregateOutputType | null
   _sum: SellerProfileSumAggregateOutputType | null
@@ -216,6 +237,9 @@ export type SellerProfileWhereInput = {
   storeName?: Prisma.StringFilter<"SellerProfile"> | string
   bio?: Prisma.StringNullableFilter<"SellerProfile"> | string | null
   rating?: Prisma.FloatNullableFilter<"SellerProfile"> | number | null
+  location?: Prisma.StringNullableFilter<"SellerProfile"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"SellerProfile"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"SellerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   products?: Prisma.ProductListRelationFilter
 }
@@ -226,6 +250,9 @@ export type SellerProfileOrderByWithRelationInput = {
   storeName?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrderInput | Prisma.SortOrder
+  location?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   products?: Prisma.ProductOrderByRelationAggregateInput
 }
@@ -239,6 +266,9 @@ export type SellerProfileWhereUniqueInput = Prisma.AtLeast<{
   storeName?: Prisma.StringFilter<"SellerProfile"> | string
   bio?: Prisma.StringNullableFilter<"SellerProfile"> | string | null
   rating?: Prisma.FloatNullableFilter<"SellerProfile"> | number | null
+  location?: Prisma.StringNullableFilter<"SellerProfile"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"SellerProfile"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"SellerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   products?: Prisma.ProductListRelationFilter
 }, "id" | "userId">
@@ -249,6 +279,9 @@ export type SellerProfileOrderByWithAggregationInput = {
   storeName?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrderInput | Prisma.SortOrder
+  location?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.SellerProfileCountOrderByAggregateInput
   _avg?: Prisma.SellerProfileAvgOrderByAggregateInput
   _max?: Prisma.SellerProfileMaxOrderByAggregateInput
@@ -265,6 +298,9 @@ export type SellerProfileScalarWhereWithAggregatesInput = {
   storeName?: Prisma.StringWithAggregatesFilter<"SellerProfile"> | string
   bio?: Prisma.StringNullableWithAggregatesFilter<"SellerProfile"> | string | null
   rating?: Prisma.FloatNullableWithAggregatesFilter<"SellerProfile"> | number | null
+  location?: Prisma.StringNullableWithAggregatesFilter<"SellerProfile"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"SellerProfile"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SellerProfile"> | Date | string
 }
 
 export type SellerProfileCreateInput = {
@@ -272,6 +308,9 @@ export type SellerProfileCreateInput = {
   storeName: string
   bio?: string | null
   rating?: number | null
+  location?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSellerProfileInput
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
 }
@@ -282,6 +321,9 @@ export type SellerProfileUncheckedCreateInput = {
   storeName: string
   bio?: string | null
   rating?: number | null
+  location?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
 }
 
@@ -290,6 +332,9 @@ export type SellerProfileUpdateInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSellerProfileNestedInput
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
 }
@@ -300,6 +345,9 @@ export type SellerProfileUncheckedUpdateInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
 }
 
@@ -309,6 +357,9 @@ export type SellerProfileCreateManyInput = {
   storeName: string
   bio?: string | null
   rating?: number | null
+  location?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type SellerProfileUpdateManyMutationInput = {
@@ -316,6 +367,9 @@ export type SellerProfileUpdateManyMutationInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SellerProfileUncheckedUpdateManyInput = {
@@ -324,6 +378,9 @@ export type SellerProfileUncheckedUpdateManyInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SellerProfileNullableScalarRelationFilter = {
@@ -337,6 +394,9 @@ export type SellerProfileCountOrderByAggregateInput = {
   storeName?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   rating?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type SellerProfileAvgOrderByAggregateInput = {
@@ -349,6 +409,9 @@ export type SellerProfileMaxOrderByAggregateInput = {
   storeName?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   rating?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type SellerProfileMinOrderByAggregateInput = {
@@ -357,6 +420,9 @@ export type SellerProfileMinOrderByAggregateInput = {
   storeName?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   rating?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type SellerProfileSumOrderByAggregateInput = {
@@ -400,10 +466,6 @@ export type SellerProfileUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SellerProfileUpdateToOneWithWhereWithoutUserInput, Prisma.SellerProfileUpdateWithoutUserInput>, Prisma.SellerProfileUncheckedUpdateWithoutUserInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableFloatFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -431,6 +493,9 @@ export type SellerProfileCreateWithoutUserInput = {
   storeName: string
   bio?: string | null
   rating?: number | null
+  location?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
 }
 
@@ -439,6 +504,9 @@ export type SellerProfileUncheckedCreateWithoutUserInput = {
   storeName: string
   bio?: string | null
   rating?: number | null
+  location?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
 }
 
@@ -463,6 +531,9 @@ export type SellerProfileUpdateWithoutUserInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
 }
 
@@ -471,6 +542,9 @@ export type SellerProfileUncheckedUpdateWithoutUserInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
 }
 
@@ -479,6 +553,9 @@ export type SellerProfileCreateWithoutProductsInput = {
   storeName: string
   bio?: string | null
   rating?: number | null
+  location?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSellerProfileInput
 }
 
@@ -488,6 +565,9 @@ export type SellerProfileUncheckedCreateWithoutProductsInput = {
   storeName: string
   bio?: string | null
   rating?: number | null
+  location?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type SellerProfileCreateOrConnectWithoutProductsInput = {
@@ -511,6 +591,9 @@ export type SellerProfileUpdateWithoutProductsInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSellerProfileNestedInput
 }
 
@@ -520,6 +603,9 @@ export type SellerProfileUncheckedUpdateWithoutProductsInput = {
   storeName?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -559,6 +645,9 @@ export type SellerProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   storeName?: boolean
   bio?: boolean
   rating?: boolean
+  location?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   products?: boolean | Prisma.SellerProfile$productsArgs<ExtArgs>
   _count?: boolean | Prisma.SellerProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -570,6 +659,9 @@ export type SellerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   storeName?: boolean
   bio?: boolean
   rating?: boolean
+  location?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["sellerProfile"]>
 
@@ -579,6 +671,9 @@ export type SellerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   storeName?: boolean
   bio?: boolean
   rating?: boolean
+  location?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["sellerProfile"]>
 
@@ -588,9 +683,12 @@ export type SellerProfileSelectScalar = {
   storeName?: boolean
   bio?: boolean
   rating?: boolean
+  location?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type SellerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "storeName" | "bio" | "rating", ExtArgs["result"]["sellerProfile"]>
+export type SellerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "storeName" | "bio" | "rating" | "location" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerProfile"]>
 export type SellerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   products?: boolean | Prisma.SellerProfile$productsArgs<ExtArgs>
@@ -615,6 +713,9 @@ export type $SellerProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     storeName: string
     bio: string | null
     rating: number | null
+    location: string | null
+    createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["sellerProfile"]>
   composites: {}
 }
@@ -1045,6 +1146,9 @@ export interface SellerProfileFieldRefs {
   readonly storeName: Prisma.FieldRef<"SellerProfile", 'String'>
   readonly bio: Prisma.FieldRef<"SellerProfile", 'String'>
   readonly rating: Prisma.FieldRef<"SellerProfile", 'Float'>
+  readonly location: Prisma.FieldRef<"SellerProfile", 'String'>
+  readonly createdAt: Prisma.FieldRef<"SellerProfile", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"SellerProfile", 'DateTime'>
 }
     
 
