@@ -32,11 +32,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
-<<<<<<< HEAD
-  const [syncMode, setSyncMode] = useState<CartSyncMode>("api");
-=======
   const [syncMode, setSyncMode] = useState<CartSyncMode>("local");
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -44,10 +40,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     async function bootstrap() {
       setIsLoading(true);
-<<<<<<< HEAD
-      setMessage("");
-=======
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       try {
         const snapshot = await loadCart();
         if (!isMounted) {
@@ -55,23 +47,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
         setItems(snapshot.items);
         setSyncMode(snapshot.mode);
-<<<<<<< HEAD
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-
-        const nextMessage = error instanceof Error ? error.message : "Could not load your cart right now.";
-        setItems([]);
-        setSyncMode("api");
-        setMessage(nextMessage);
-        showToast({
-          title: "Cart unavailable",
-          message: nextMessage,
-          tone: "error",
-        });
-=======
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -97,27 +72,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (result.message) {
         setMessage(result.message);
         showToast({
-<<<<<<< HEAD
-          title: "Cart updated",
-          message: result.message,
-          tone: "success",
-        });
-      }
-    } catch (error) {
-      const nextMessage = error instanceof Error ? error.message : "Could not update your cart right now.";
-      setMessage(nextMessage);
-      showToast({
-        title: "Cart update failed",
-        message: nextMessage,
-        tone: "error",
-      });
-=======
           title: result.mode === "api" ? "Cart updated" : "Saved locally",
           message: result.message,
           tone: result.mode === "api" ? "success" : "info",
         });
       }
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     } finally {
       setIsMutating(false);
     }

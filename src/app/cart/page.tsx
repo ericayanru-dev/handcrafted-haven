@@ -12,10 +12,7 @@ export default function CartPage() {
     subtotal,
     isLoading,
     isMutating,
-<<<<<<< HEAD
-=======
     syncMode,
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     message,
     updateQuantity,
     removeItem,
@@ -39,15 +36,12 @@ export default function CartPage() {
               <p className={styles.lead}>Update quantities, remove items, and review your total before checkout.</p>
             </header>
 
-<<<<<<< HEAD
-=======
             {syncMode === "local" ? (
               <p className={styles.infoBanner}>
                 Backend cart APIs are not available yet. Your cart is currently saved in local storage.
               </p>
             ) : null}
 
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
             {message ? <p className={styles.infoBanner}>{message}</p> : null}
 
             {items.length === 0 ? (

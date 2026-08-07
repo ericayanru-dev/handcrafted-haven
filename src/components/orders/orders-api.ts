@@ -1,12 +1,9 @@
 import type { CreateOrderInput, OrderRecord, OrdersResponse } from "./types";
 
-<<<<<<< HEAD
-=======
 const ORDERS_STORAGE_KEY = "handcrafted-haven-orders-v1";
 const ORDER_METADATA_KEY = "handcrafted-haven-order-metadata-v1";
 const ORDERS_API_ENABLED = process.env.NEXT_PUBLIC_ENABLE_ORDERS_API !== "0";
 
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 type ApiOrderItem = {
   productId: string;
   quantity: number;
@@ -25,12 +22,6 @@ type ApiOrderRecord = {
   total?: number | string;
   reference?: string;
   items?: ApiOrderItem[];
-<<<<<<< HEAD
-  paymentMethod?: OrderRecord["paymentMethod"];
-  shipping?: OrderRecord["shipping"];
-};
-
-=======
 };
 
 type StoredOrderMetadata = {
@@ -46,7 +37,6 @@ function canUseWindow() {
   return typeof window !== "undefined";
 }
 
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 function clampMoney(value: number) {
   return Math.round(value * 100) / 100;
 }
@@ -62,28 +52,6 @@ function normalizeOrder(order: OrderRecord): OrderRecord {
   };
 }
 
-<<<<<<< HEAD
-function toOrdersErrorMessage(status: number, payload: OrdersResponse) {
-  const rawMessage = (payload.message ?? payload.error ?? "").trim().toLowerCase();
-
-  if (status === 401 || status === 403 || rawMessage.includes("unauthorized") || rawMessage.includes("forbidden")) {
-    return "Please sign in to view and manage your orders.";
-  }
-
-  if (status === 404) {
-    return "We could not find that order.";
-  }
-
-  if (status >= 500) {
-    return "We are having trouble loading your order details right now. Please try again shortly.";
-  }
-
-  if (payload.message || payload.error) {
-    return payload.message ?? payload.error ?? "We could not complete your request right now.";
-  }
-
-  return "We could not complete your request right now.";
-=======
 function readLocalOrders(): OrderRecord[] {
   if (!canUseWindow()) {
     return [];
@@ -155,7 +123,6 @@ function createLocalOrderId() {
     return crypto.randomUUID();
   }
   return `order-${Date.now()}`;
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 }
 
 async function fetchOrdersEndpoint(path: string, init?: RequestInit) {
@@ -175,13 +142,7 @@ async function fetchOrdersEndpoint(path: string, init?: RequestInit) {
   }
 
   if (!response.ok || !payload.success) {
-<<<<<<< HEAD
-    throw new Error(toOrdersErrorMessage(response.status, payload));
-=======
-    throw new Error(
-      payload.message ?? payload.error ?? `Orders request failed (${response.status})`,
-    );
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
+    throw new Error(payload.message ?? payload.error ?? `Orders request failed (${response.status})`);
   }
 
   return payload;
@@ -216,55 +177,35 @@ function normalizeApiStatus(status?: string): OrderRecord["status"] {
   }
 }
 
-<<<<<<< HEAD
-function normalizeApiOrder(order: ApiOrderRecord): OrderRecord {
+function normalizeApiOrder(order: ApiOrderRecord, metadata?: StoredOrderMetadata | null): OrderRecord {
   const items = normalizeApiItems(order.items);
-  const subtotal = clampMoney(items.reduce((sum, item) => sum + item.price * item.quantity, 0));
-  const total = clampMoney(Number(order.total) || subtotal);
-  const tax = clampMoney(total - subtotal);
-=======
-function normalizeApiOrder(
-  order: ApiOrderRecord,
-  metadata?: StoredOrderMetadata | null,
-): OrderRecord {
-  const items = normalizeApiItems(order.items);
-  const subtotal =
-    metadata?.subtotal ??
-    clampMoney(items.reduce((sum, item) => sum + item.price * item.quantity, 0));
+  const subtotal = metadata?.subtotal ?? clampMoney(items.reduce((sum, item) => sum + item.price * item.quantity, 0));
   const total = clampMoney(Number(order.total) || metadata?.total || subtotal);
   const tax = metadata?.tax ?? clampMoney(total - subtotal);
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
   return normalizeOrder({
     id: order.id,
     createdAt: order.createdAt || new Date().toISOString(),
     status: normalizeApiStatus(order.status),
-<<<<<<< HEAD
-    paymentMethod: order.paymentMethod,
-    shipping: order.shipping,
-=======
     paymentMethod: metadata?.paymentMethod ?? "CARD",
-    shipping: metadata?.shipping ?? {
-      fullName: "Order customer",
-      email: "",
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      postalCode: "",
-      country: "",
-    },
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
+    shipping:
+      metadata?.shipping ??
+      {
+        fullName: "Order customer",
+        email: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
+      },
     items,
     itemCount: items.reduce((sum, item) => sum + Math.max(1, item.quantity), 0),
     subtotal,
     tax,
     total,
-<<<<<<< HEAD
-    sourceMode: "api",
-=======
     sourceMode: metadata?.sourceMode ?? "api",
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   });
 }
 
@@ -300,50 +241,8 @@ function extractOrders(payload: OrdersResponse): ApiOrderRecord[] {
   return [];
 }
 
-<<<<<<< HEAD
-export async function createOrder(input: CreateOrderInput): Promise<{ order: OrderRecord; mode: "api"; message?: string }> {
-  const payload = await fetchOrdersEndpoint("/api/orders/checkout", {
-    method: "POST",
-  });
-
-  const order = extractOrder(payload);
-  if (!order) {
-    throw new Error("We could not confirm your order details. Please refresh and try again.");
-  }
-
-  return {
-    order: normalizeApiOrder({
-      ...order,
-      paymentMethod: input.paymentMethod,
-      shipping: input.shipping,
-    }),
-    mode: "api",
-    message: payload.message,
-  };
-}
-
-export async function loadOrderHistory(): Promise<{ orders: OrderRecord[]; mode: "api" }> {
-  const payload = await fetchOrdersEndpoint("/api/orders/history", { method: "GET" });
-  return {
-    orders: extractOrders(payload).map((order) => normalizeApiOrder(order)),
-    mode: "api",
-  };
-}
-
-export async function loadOrderById(orderId: string): Promise<{ order: OrderRecord | null; mode: "api" }> {
-  const payload = await fetchOrdersEndpoint(`/api/orders/get-order/${orderId}`, { method: "GET" });
-  const order = extractOrder(payload);
-  return {
-    order: order ? normalizeApiOrder(order) : null,
-    mode: "api",
-  };
-=======
-export async function createOrder(
-  input: CreateOrderInput,
-): Promise<{ order: OrderRecord; mode: "api" | "local"; message?: string }> {
-  const subtotal = clampMoney(
-    input.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
-  );
+export async function createOrder(input: CreateOrderInput): Promise<{ order: OrderRecord; mode: "api" | "local"; message?: string }> {
+  const subtotal = clampMoney(input.items.reduce((sum, item) => sum + item.price * item.quantity, 0));
   const tax = clampMoney(subtotal * 0.07);
   const total = clampMoney(subtotal + tax);
 
@@ -405,10 +304,7 @@ export async function createOrder(
   }
 }
 
-export async function loadOrderHistory(): Promise<{
-  orders: OrderRecord[];
-  mode: "api" | "local";
-}> {
+export async function loadOrderHistory(): Promise<{ orders: OrderRecord[]; mode: "api" | "local" }> {
   if (!ORDERS_API_ENABLED) {
     return {
       orders: readLocalOrders(),
@@ -431,9 +327,7 @@ export async function loadOrderHistory(): Promise<{
   }
 }
 
-export async function loadOrderById(
-  orderId: string,
-): Promise<{ order: OrderRecord | null; mode: "api" | "local" }> {
+export async function loadOrderById(orderId: string): Promise<{ order: OrderRecord | null; mode: "api" | "local" }> {
   if (!ORDERS_API_ENABLED) {
     const local = readLocalOrders().find((order) => order.id === orderId) ?? null;
     return {
@@ -443,9 +337,7 @@ export async function loadOrderById(
   }
 
   try {
-    const payload = await fetchOrdersEndpoint(`/api/orders/get-order/${orderId}`, {
-      method: "GET",
-    });
+    const payload = await fetchOrdersEndpoint(`/api/orders/get-order/${orderId}`, { method: "GET" });
     const order = extractOrder(payload);
     return {
       order: order ? normalizeApiOrder(order, getOrderMetadata(orderId)) : null,
@@ -458,5 +350,4 @@ export async function loadOrderById(
       mode: "local",
     };
   }
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 }

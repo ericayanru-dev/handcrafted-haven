@@ -81,15 +81,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [product, setProduct] = useState<ProductDetailsResponse["data"]>(undefined);
-<<<<<<< HEAD
-  const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
-  const [reviews, setReviews] = useState<ProductReview[]>([]);
-=======
   const [addedMessage, setAddedMessage] = useState("");
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [reviewsMode, setReviewsMode] = useState<"api" | "local">("local");
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   const [reviewNotice, setReviewNotice] = useState("");
   const [reviewError, setReviewError] = useState("");
   const [isSavingReview, setIsSavingReview] = useState(false);
@@ -197,13 +192,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       }
 
       setReviews(result.reviews);
-<<<<<<< HEAD
-      if (result.message) {
-        setReviewError(result.message);
-      }
-=======
       setReviewsMode(result.mode);
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     }
 
     loadReviews();
@@ -235,13 +224,6 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
     return currentUserReview;
   }, [currentUserReview, editingReviewId, reviews]);
-<<<<<<< HEAD
-  const cartMessageIsError = useMemo(
-    () => /fail|error|could not|unable|unauthorized|forbidden/i.test(cartMessage),
-    [cartMessage],
-  );
-=======
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
   async function handleAddToCart() {
     if (!product) {
@@ -258,10 +240,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       stock: product.stock,
       quantity: 1,
     });
-<<<<<<< HEAD
-=======
     setAddedMessage(`${product.title} added to cart.`);
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   }
 
   async function handleSaveReview(input: ReviewFormInput) {
@@ -288,16 +267,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       setReviews((current) => {
         const next = current.filter((review) => review.userId !== sessionUser.id);
         return [result.review, ...next].sort(
-<<<<<<< HEAD
-          (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
-        );
-      });
-=======
           (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime()
         );
       });
       setReviewsMode(result.mode);
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       setReviewNotice(result.message);
       setEditingReviewId(null);
     } catch {
@@ -323,12 +296,6 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
     try {
       const result = await deleteProductReview({
-<<<<<<< HEAD
-        reviewId: review.id,
-      });
-
-      setReviews((current) => current.filter((item) => item.id !== review.id));
-=======
         productId: product.id,
         reviewId: review.id,
         userId: sessionUser.id,
@@ -336,7 +303,6 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
       setReviews((current) => current.filter((item) => item.id !== review.id));
       setReviewsMode(result.mode);
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       setReviewNotice(result.message);
       setEditingReviewId(null);
     } catch {
@@ -405,21 +371,11 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 <span>{product.stock} in stock</span>
                 <span>Store: {product.seller?.storeName ?? "Unknown"}</span>
                 <span>Seller: {product.seller?.user?.name ?? "Unknown"}</span>
-<<<<<<< HEAD
-                <span>
-                  {reviews.length} review{reviews.length === 1 ? "" : "s"}
-                </span>
-              </div>
-
-              {cartMessage ? (
-                <p className={cartMessageIsError ? styles.error : styles.success}>{cartMessage}</p>
-=======
                 <span>{reviews.length} review{reviews.length === 1 ? "" : "s"}</span>
               </div>
 
               {addedMessage || cartMessage ? (
                 <p className={styles.success}>{addedMessage || cartMessage}</p>
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               ) : null}
 
               <div className={styles.actions}>
@@ -456,28 +412,17 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-<<<<<<< HEAD
-=======
             {reviewsMode === "local" ? (
               <p className={reviewStyles.reviewInfo}>
                 Review actions are running in local preview mode until dedicated backend review APIs are connected.
               </p>
             ) : null}
 
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
             {reviewNotice ? <p className={reviewStyles.reviewSuccess}>{reviewNotice}</p> : null}
             {reviewError ? <p className={reviewStyles.reviewError}>{reviewError}</p> : null}
 
             {sessionUser ? (
-<<<<<<< HEAD
-              <ReviewForm
-                existingReview={activeReview}
-                isBusy={isSavingReview}
-                onSave={handleSaveReview}
-              />
-=======
               <ReviewForm existingReview={activeReview} isBusy={isSavingReview} onSave={handleSaveReview} />
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
             ) : (
               <p className={reviewStyles.reviewPrompt}>
                 Log in to leave a review once you have tried the product.
