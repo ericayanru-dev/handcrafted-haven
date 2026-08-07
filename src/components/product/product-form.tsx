@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
+import { useEffect, useMemo, useRef, useState } from "react";
+=======
 import { useMemo, useState, useRef } from "react";
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Button, Card } from "@/components/ui";
@@ -26,6 +30,20 @@ const productSchema = z.object({
   imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
 
+<<<<<<< HEAD
+const editableFields = ["title", "description", "price", "stock", "category", "imageUrl"] as const;
+
+const editFieldSchemas = {
+  title: productSchema.shape.title,
+  description: productSchema.shape.description,
+  price: productSchema.shape.price,
+  stock: productSchema.shape.stock,
+  category: productSchema.shape.category,
+  imageUrl: productSchema.shape.imageUrl,
+};
+
+=======
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 export type ProductFormValues = {
   title: string;
   description: string;
@@ -63,9 +81,18 @@ const defaultValues: ProductFormValues = {
 
 export function ProductForm({ mode, productId, initialValues }: ProductFormProps) {
   const router = useRouter();
+<<<<<<< HEAD
+  const baseValues: ProductFormValues = {
+    ...defaultValues,
+    ...initialValues,
+  };
+  const [values, setValues] = useState<ProductFormValues>({
+    ...baseValues,
+=======
   const [values, setValues] = useState<ProductFormValues>({
     ...defaultValues,
     ...initialValues,
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
@@ -74,6 +101,23 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   const [isUploading, setIsUploading] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string | null>(initialValues?.imageUrl ?? null);
 
+<<<<<<< HEAD
+  useEffect(() => {
+    if (mode !== "edit") {
+      return;
+    }
+
+    const nextValues: ProductFormValues = {
+      ...defaultValues,
+      ...initialValues,
+    };
+
+    setValues(nextValues);
+    setPreviewSrc(nextValues.imageUrl || null);
+  }, [mode, initialValues]);
+
+=======
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   const heading = mode === "create" ? "Create product" : "Edit product";
 
   const endpoint = useMemo(() => {
@@ -157,6 +201,65 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
       return;
     }
 
+<<<<<<< HEAD
+    let payload: Record<string, unknown> = {};
+
+    if (mode === "create") {
+      const validation = productSchema.safeParse(values);
+
+      if (!validation.success) {
+        const nextErrors: FieldErrors = {};
+        for (const issue of validation.error.issues) {
+          const fieldName = issue.path[0];
+          if (
+            fieldName === "title" ||
+            fieldName === "description" ||
+            fieldName === "price" ||
+            fieldName === "stock" ||
+            fieldName === "category" ||
+            fieldName === "imageUrl"
+          ) {
+            nextErrors[fieldName] = issue.message;
+          }
+        }
+        setFieldErrors(nextErrors);
+        return;
+      }
+
+      payload = {
+        title: validation.data.title,
+        description: validation.data.description,
+        price: validation.data.price,
+        stock: validation.data.stock,
+        category: validation.data.category,
+        imageUrl: validation.data.imageUrl || undefined,
+      };
+    } else {
+      const changedFields = editableFields.filter((field) => values[field] !== baseValues[field]);
+
+      if (changedFields.length === 0) {
+        setFormError("Update at least one field before saving.");
+        return;
+      }
+
+      const nextErrors: FieldErrors = {};
+
+      for (const field of changedFields) {
+        const parsed = editFieldSchemas[field].safeParse(values[field]);
+
+        if (!parsed.success) {
+          nextErrors[field] = parsed.error.issues[0]?.message ?? "Invalid value";
+          continue;
+        }
+
+        payload[field] = field === "imageUrl" ? parsed.data || null : parsed.data;
+      }
+
+      if (Object.keys(nextErrors).length > 0) {
+        setFieldErrors(nextErrors);
+        return;
+      }
+=======
     const validation = productSchema.safeParse(values);
 
     if (!validation.success) {
@@ -176,6 +279,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
       }
       setFieldErrors(nextErrors);
       return;
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     }
 
     setFieldErrors({});
@@ -189,6 +293,9 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         headers: {
           "Content-Type": "application/json",
         },
+<<<<<<< HEAD
+        body: JSON.stringify(payload),
+=======
         body: JSON.stringify({
           title: validation.data.title,
           description: validation.data.description,
@@ -197,6 +304,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
           category: validation.data.category,
           imageUrl: validation.data.imageUrl || undefined,
         }),
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       });
 
       const result = (await response.json()) as ProductApiResponse;
@@ -246,7 +354,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="title"
               onChange={(e) => updateField("title", e.target.value)}
+<<<<<<< HEAD
+              required={mode === "create"}
+=======
               required
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               value={values.title}
             />
             {fieldErrors.title && <p className={styles.error}>{fieldErrors.title}</p>}
@@ -260,7 +372,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="category"
               onChange={(e) => updateField("category", e.target.value)}
+<<<<<<< HEAD
+              required={mode === "create"}
+=======
               required
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               value={values.category}
             />
             {fieldErrors.category && <p className={styles.error}>{fieldErrors.category}</p>}
@@ -276,7 +392,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               inputMode="decimal"
               min="0.01"
               onChange={(e) => updateField("price", e.target.value)}
+<<<<<<< HEAD
+              required={mode === "create"}
+=======
               required
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               step="0.01"
               type="number"
               value={values.price}
@@ -294,7 +414,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               inputMode="numeric"
               min="0"
               onChange={(e) => updateField("stock", e.target.value)}
+<<<<<<< HEAD
+              required={mode === "create"}
+=======
               required
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               step="1"
               type="number"
               value={values.stock}
@@ -310,7 +434,11 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="description"
               onChange={(e) => updateField("description", e.target.value)}
+<<<<<<< HEAD
+              required={mode === "create"}
+=======
               required
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               value={values.description}
             />
             {fieldErrors.description && <p className={styles.error}>{fieldErrors.description}</p>}

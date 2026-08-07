@@ -1,8 +1,11 @@
 import type { AddCartItemInput, CartItem, CartMutationResult, CartSnapshot } from "./cart-types";
 
+<<<<<<< HEAD
+=======
 const CART_STORAGE_KEY = "handcrafted-haven-cart-v1";
 const CART_API_ENABLED = process.env.NEXT_PUBLIC_ENABLE_CART_API !== "0";
 
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 type CartApiResponse = {
   success?: boolean;
   data?:
@@ -44,10 +47,13 @@ type CartApiResponse = {
   error?: string;
 };
 
+<<<<<<< HEAD
+=======
 function canUseWindow() {
   return typeof window !== "undefined";
 }
 
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 function normalizeItems(items: CartItem[]) {
   return items
     .map((item) => ({
@@ -58,6 +64,24 @@ function normalizeItems(items: CartItem[]) {
     .filter((item) => item.productId && item.title);
 }
 
+<<<<<<< HEAD
+function toCartErrorMessage(status: number, payload: CartApiResponse) {
+  const rawMessage = (payload.message ?? payload.error ?? "").trim().toLowerCase();
+
+  if (status === 401 || status === 403 || rawMessage.includes("unauthorized") || rawMessage.includes("forbidden")) {
+    return "Please sign in to view and manage your cart.";
+  }
+
+  if (status >= 500) {
+    return "We are having trouble loading your cart right now. Please try again shortly.";
+  }
+
+  if (payload.message || payload.error) {
+    return payload.message ?? payload.error ?? "We could not update your cart right now.";
+  }
+
+  return "We could not update your cart right now.";
+=======
 function readLocalCart(): CartItem[] {
   if (!canUseWindow()) {
     return [];
@@ -131,6 +155,7 @@ function removeLocalItem(productId: string) {
 function clearLocalItems() {
   writeLocalCart([]);
   return [];
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 }
 
 async function fetchCartEndpoint(path: string, init?: RequestInit) {
@@ -150,7 +175,11 @@ async function fetchCartEndpoint(path: string, init?: RequestInit) {
   }
 
   if (!response.ok || !payload.success) {
+<<<<<<< HEAD
+    throw new Error(toCartErrorMessage(response.status, payload));
+=======
     throw new Error(payload.message ?? payload.error ?? `Cart request failed (${response.status})`);
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   }
 
   return payload;
@@ -191,6 +220,64 @@ function fromApi(payload: CartApiResponse): CartSnapshot {
 }
 
 export async function loadCart(): Promise<CartSnapshot> {
+<<<<<<< HEAD
+  const payload = await fetchCartEndpoint("/api/cart/get");
+  return fromApi(payload);
+}
+
+export async function addCartItem(input: AddCartItemInput): Promise<CartMutationResult> {
+  await fetchCartEndpoint("/api/cart/add", {
+    method: "POST",
+    body: JSON.stringify({
+      productId: input.productId,
+      quantity: input.quantity ?? 1,
+    }),
+  });
+
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Item added to cart.",
+  };
+}
+
+export async function setCartItemQuantity(productId: string, quantity: number): Promise<CartMutationResult> {
+  await fetchCartEndpoint("/api/cart/update", {
+    method: "PATCH",
+    body: JSON.stringify({ productId, quantity }),
+  });
+
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Cart updated.",
+  };
+}
+
+export async function removeCartItem(productId: string): Promise<CartMutationResult> {
+  await fetchCartEndpoint("/api/cart/remove", {
+    method: "DELETE",
+    body: JSON.stringify({ productId }),
+  });
+
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Item removed from cart.",
+  };
+}
+
+export async function clearCartItems(): Promise<CartMutationResult> {
+  await fetchCartEndpoint("/api/cart/clear", {
+    method: "DELETE",
+  });
+
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Cart cleared.",
+  };
+=======
   if (!CART_API_ENABLED) {
     return {
       items: readLocalCart(),
@@ -325,4 +412,5 @@ export async function clearCartItems(): Promise<CartMutationResult> {
       message: "Saved to local cart.",
     };
   }
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 }

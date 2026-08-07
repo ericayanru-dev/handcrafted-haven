@@ -78,7 +78,10 @@ export default function SellerDashboardPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [sellerPayload, setSellerPayload] = useState<SellerApiResponse["data"]>(undefined);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
+<<<<<<< HEAD
+=======
   const [ordersMode, setOrdersMode] = useState<"api" | "local">("local");
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
   useEffect(() => {
     let isMounted = true;
@@ -116,7 +119,10 @@ export default function SellerDashboardPage() {
         }
 
         setOrders(ordersResult.orders);
+<<<<<<< HEAD
+=======
         setOrdersMode(ordersResult.mode);
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       } catch {
         if (isMounted) {
           setErrorMessage("Could not load seller dashboard right now.");
@@ -252,7 +258,11 @@ export default function SellerDashboardPage() {
     {
       label: "Revenue",
       value: formatCurrency(derived.sales.revenue),
+<<<<<<< HEAD
+      note: "Updated from your latest sales activity.",
+=======
       note: ordersMode === "local" ? "Local estimate until dashboard API is connected." : "Synced from API.",
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     },
     {
       label: "Orders",
@@ -262,12 +272,20 @@ export default function SellerDashboardPage() {
     {
       label: "Units sold",
       value: String(derived.sales.soldUnits),
+<<<<<<< HEAD
+      note: "Total items sold across orders that include your products.",
+=======
       note: "Combined quantity from orders linked to your listings.",
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     },
     {
       label: "Average order",
       value: formatCurrency(derived.sales.averageOrderValue),
+<<<<<<< HEAD
+      note: "Average order value when your products are included.",
+=======
       note: "Average value per order containing your products.",
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     },
   ];
 
@@ -287,12 +305,15 @@ export default function SellerDashboardPage() {
 
           <DashboardNavigation />
 
+<<<<<<< HEAD
+=======
           {ordersMode === "local" ? (
             <p className={styles.info}>
               Sales and order stats are in local preview mode while backend dashboard endpoints are being implemented.
             </p>
           ) : null}
 
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
           <SellerOverview {...derived.seller} />
 
           <div className={styles.stack}>

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+import type { CartItem } from "@/components/cart/cart-types";
+=======
 import type { CartItem, CartSyncMode } from "@/components/cart/cart-types";
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
 export type OrderStatus =
   | "PLACED"
@@ -28,21 +32,33 @@ export type OrderRecord = {
   id: string;
   createdAt: string;
   status: OrderStatus;
+<<<<<<< HEAD
+  paymentMethod?: PaymentMethod;
+  shipping?: ShippingAddress;
+=======
   paymentMethod: PaymentMethod;
   shipping: ShippingAddress;
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   items: CartItem[];
   itemCount: number;
   subtotal: number;
   tax: number;
   total: number;
+<<<<<<< HEAD
+  sourceMode: "api";
+=======
   sourceMode: CartSyncMode;
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 };
 
 export type CreateOrderInput = {
   items: CartItem[];
   paymentMethod: PaymentMethod;
   shipping: ShippingAddress;
+<<<<<<< HEAD
+=======
   sourceMode: CartSyncMode;
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 };
 
 export type OrdersResponse = {

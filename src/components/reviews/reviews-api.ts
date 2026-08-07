@@ -1,7 +1,11 @@
+<<<<<<< HEAD
+import type { ProductReview, ReviewUser } from "./types";
+=======
 import type { ProductReview, ReviewFormInput, ReviewUser } from "./types";
 
 const REVIEW_STORAGE_KEY = "handcrafted-haven-reviews-v1";
 const REVIEW_API_ENABLED = process.env.NEXT_PUBLIC_ENABLE_REVIEW_API === "1";
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
 type ReviewApiResponse = {
   success?: boolean;
@@ -13,6 +17,8 @@ type ReviewApiResponse = {
   error?: string;
 };
 
+<<<<<<< HEAD
+=======
 function canUseWindow() {
   return typeof window !== "undefined";
 }
@@ -43,6 +49,7 @@ function writeLocalReviews(reviews: ProductReview[]) {
   window.localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(reviews));
 }
 
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 function normalizeReview(review: ProductReview): ProductReview {
   return {
     ...review,
@@ -53,6 +60,10 @@ function normalizeReview(review: ProductReview): ProductReview {
   };
 }
 
+<<<<<<< HEAD
+function sortReviews(reviews: ProductReview[]) {
+  return reviews.map(normalizeReview).sort(
+=======
 function mergeReviews(productId: string, initialReviews: ProductReview[]) {
   const localReviews = readLocalReviews().filter((review) => review.productId === productId).map(normalizeReview);
   const merged = new Map<string, ProductReview>();
@@ -73,10 +84,36 @@ function mergeReviews(productId: string, initialReviews: ProductReview[]) {
   }
 
   return Array.from(merged.values()).sort(
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime()
   );
 }
 
+<<<<<<< HEAD
+function toReviewErrorMessage(status: number, payload: ReviewApiResponse) {
+  const rawMessage = (payload.message ?? payload.error ?? "").trim().toLowerCase();
+
+  if (status === 401 || status === 403 || rawMessage.includes("unauthorized") || rawMessage.includes("forbidden")) {
+    return "Please sign in to view and share reviews.";
+  }
+
+  if (status === 404) {
+    return "Reviews are not available for this product yet.";
+  }
+
+  if (status >= 500) {
+    return "We are having trouble loading reviews right now. Please try again shortly.";
+  }
+
+  if (payload.message || payload.error) {
+    return payload.message ?? payload.error ?? "We could not load reviews right now.";
+  }
+
+  return "We could not load reviews right now.";
+}
+
+=======
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 async function fetchReviewEndpoint(path: string, init?: RequestInit) {
   const response = await fetch(path, {
     ...init,
@@ -94,13 +131,19 @@ async function fetchReviewEndpoint(path: string, init?: RequestInit) {
   }
 
   if (!response.ok || !payload.success) {
+<<<<<<< HEAD
+    throw new Error(toReviewErrorMessage(response.status, payload));
+=======
     throw new Error(payload.message ?? payload.error ?? `Review request failed (${response.status})`);
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   }
 
   return payload;
 }
 
 export async function loadProductReviews(productId: string, initialReviews: ProductReview[]) {
+<<<<<<< HEAD
+=======
   if (!REVIEW_API_ENABLED) {
     return {
       reviews: mergeReviews(productId, initialReviews),
@@ -108,10 +151,19 @@ export async function loadProductReviews(productId: string, initialReviews: Prod
     };
   }
 
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   try {
     const payload = await fetchReviewEndpoint(`/api/review?productId=${encodeURIComponent(productId)}`);
     const reviews = payload.data?.reviews ?? initialReviews;
     return {
+<<<<<<< HEAD
+      reviews: sortReviews(reviews),
+    };
+  } catch (error) {
+    return {
+      reviews: sortReviews(initialReviews),
+      message: error instanceof Error ? error.message : "Could not load latest reviews.",
+=======
       reviews: mergeReviews(productId, reviews),
       mode: "api" as const,
     };
@@ -119,6 +171,7 @@ export async function loadProductReviews(productId: string, initialReviews: Prod
     return {
       reviews: mergeReviews(productId, initialReviews),
       mode: "local" as const,
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     };
   }
 }
@@ -129,7 +182,11 @@ export async function saveProductReview(input: {
   rating: number;
   comment: string;
   existingReviewId?: string;
+<<<<<<< HEAD
+}): Promise<{ review: ProductReview; mode: "api"; message: string }> {
+=======
 }) {
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   const nextReview = normalizeReview({
     id: input.existingReviewId ?? `review-${Date.now()}`,
     productId: input.productId,
@@ -141,6 +198,35 @@ export async function saveProductReview(input: {
     updatedAt: new Date().toISOString(),
   });
 
+<<<<<<< HEAD
+  const payload = await fetchReviewEndpoint(
+    input.existingReviewId ? `/api/review/${input.existingReviewId}` : "/api/review",
+    {
+      method: input.existingReviewId ? "PATCH" : "POST",
+      body: JSON.stringify({
+        productId: input.productId,
+        rating: input.rating,
+        comment: input.comment,
+      }),
+    }
+  );
+
+  return {
+    review: normalizeReview(payload.data?.review ?? nextReview),
+    mode: "api",
+    message: payload.message ?? "Review saved.",
+  };
+}
+
+export async function deleteProductReview(input: { reviewId: string }) {
+  const payload = await fetchReviewEndpoint(`/api/review/${input.reviewId}`, {
+    method: "DELETE",
+  });
+
+  return {
+    mode: "api" as const,
+    message: payload.message ?? "Review deleted.",
+=======
   if (REVIEW_API_ENABLED) {
     try {
       const payload = await fetchReviewEndpoint(
@@ -204,5 +290,6 @@ export async function deleteProductReview(input: { productId: string; reviewId: 
   return {
     mode: "local" as const,
     message: "Review deleted locally until backend review APIs are available.",
+>>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   };
 }
