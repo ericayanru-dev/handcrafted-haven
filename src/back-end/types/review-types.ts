@@ -13,3 +13,14 @@ export interface Review {
   product: Product; // relation to Product
   user: User; // relation to User
 }
+
+export interface CreateReviewInput {
+  productId: string;
+  rating: number;
+  comment: string;
+}
+
+export interface UpdateReviewInput {
+  rating?: number;
+  comment?: string;
+}
