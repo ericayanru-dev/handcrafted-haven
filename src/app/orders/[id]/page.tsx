@@ -1,15 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import {
-  formatCurrency,
-  formatDate,
-  loadOrderById,
-  orderNumberFromId,
-  paymentLabel,
-  statusLabel,
-  type OrderRecord,
-} from "@/components/orders";
+import { formatCurrency, formatDate, loadOrderById, orderNumberFromId, paymentLabel, statusLabel, type OrderRecord } from "@/components/orders";
 import { Loading } from "@/components/state/loading";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
@@ -93,9 +85,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
           </header>
 
           {mode === "local" ? (
-            <p className={styles.info}>
-              This order is currently loaded from local frontend storage.
-            </p>
+            <p className={styles.info}>This order is currently loaded from local frontend storage.</p>
           ) : null}
 
           <div className={styles.layout}>
@@ -118,8 +108,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 <div className={styles.metaRow}>
                   <dt>Address</dt>
                   <dd>
-                    {order.shipping.addressLine1}, {order.shipping.city}, {order.shipping.state}{" "}
-                    {order.shipping.postalCode}
+                    {order.shipping.addressLine1}, {order.shipping.city}, {order.shipping.state} {order.shipping.postalCode}
                   </dd>
                 </div>
                 <div className={styles.metaRow}>
