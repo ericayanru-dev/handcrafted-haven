@@ -1,16 +1,17 @@
 import { cartModel } from "@/back-end/models/cart-model";
-import { productModel } from "@/back-end/models/product-model";
 import {
   addToCartSchema,
   updateCartItemSchema,
   removeCartItemSchema,
 } from "@/back-end/lib/validation/cart-validations";
 import { formatZodError } from "@/back-end/lib/utils/helper";
+import type {
+  AddToCartInput,
+  RemoveCartItemInput,
+  UpdateCartItemInput,
+} from "@/back-end/types/cart-types";
 
 export class CartService {
-  /**
-   * GET cart
-   */
   async getCart(userId: string) {
     try {
       const cart = await cartModel.getOrCreateCart(userId);
@@ -48,8 +49,10 @@ export class CartService {
 
   /**
    * POST add to cart
+   * Checks: existingQty + requestedQty <= stock
+   * Uses transaction to reduce race conditions
    */
-  async addToCart(userId: string, body: unknown) {
+  async addToCart(userId: string, body: AddToCartInput) {
     try {
       const validation = addToCartSchema.safeParse(body);
       if (!validation.success) {
@@ -61,30 +64,35 @@ export class CartService {
       }
 
       const { productId, quantity } = validation.data;
-
-      const product = await productModel.findById(productId);
-      if (!product) {
-        return {
-          success: false,
-          message: "Product not found",
-          status: 404,
-        };
-      }
-
-      if (product.stock < quantity) {
-        return {
-          success: false,
-          message: `Only ${product.stock} item(s) available in stock`,
-          status: 400,
-        };
-      }
-
       const cart = await cartModel.getOrCreateCart(userId);
-      const item = await cartModel.addItem(cart.id, productId, quantity);
+
+      const result = await cartModel.addItemSafe(cart.id, productId, quantity);
+
+      if ("error" in result) {
+        if (result.error === "NOT_FOUND") {
+          return {
+            success: false,
+            message: "Product not found",
+            status: 404,
+          };
+        }
+
+        if (result.error === "INSUFFICIENT_STOCK") {
+          const remaining = Math.max(result.available - (result.currentQty ?? 0), 0);
+          return {
+            success: false,
+            message:
+              remaining > 0
+                ? `Only ${remaining} more item(s) can be added (${result.available} in stock, ${result.currentQty} already in cart)`
+                : `Only ${result.available} item(s) available in stock`,
+            status: 400,
+          };
+        }
+      }
 
       return {
         success: true,
-        data: item,
+        data: result.item,
         message: "Item added to cart",
         status: 201,
       };
@@ -99,9 +107,9 @@ export class CartService {
   }
 
   /**
-   * PATCH update quantity
+   * PATCH update quantity (absolute value)
    */
-  async updateItem(userId: string, body: unknown) {
+  async updateItem(userId: string, body: UpdateCartItemInput) {
     try {
       const validation = updateCartItemSchema.safeParse(body);
       if (!validation.success) {
@@ -123,28 +131,37 @@ export class CartService {
         };
       }
 
-      const product = await productModel.findById(productId);
-      if (!product) {
-        return {
-          success: false,
-          message: "Product not found",
-          status: 404,
-        };
-      }
+      const result = await cartModel.updateItemSafe(cart.id, productId, quantity);
 
-      if (product.stock < quantity) {
-        return {
-          success: false,
-          message: `Only ${product.stock} item(s) available in stock`,
-          status: 400,
-        };
-      }
+      if ("error" in result) {
+        if (result.error === "NOT_FOUND") {
+          return {
+            success: false,
+            message: "Product not found",
+            status: 404,
+          };
+        }
 
-      const item = await cartModel.updateItem(cart.id, productId, quantity);
+        if (result.error === "ITEM_NOT_FOUND") {
+          return {
+            success: false,
+            message: "Item not found in cart",
+            status: 404,
+          };
+        }
+
+        if (result.error === "INSUFFICIENT_STOCK") {
+          return {
+            success: false,
+            message: `Only ${result.available} item(s) available in stock`,
+            status: 400,
+          };
+        }
+      }
 
       return {
         success: true,
-        data: item,
+        data: result.item,
         message: "Cart updated",
         status: 200,
       };
@@ -158,10 +175,7 @@ export class CartService {
     }
   }
 
-  /**
-   * DELETE one item
-   */
-  async removeItem(userId: string, body: unknown) {
+  async removeItem(userId: string, body: RemoveCartItemInput) {
     try {
       const validation = removeCartItemSchema.safeParse(body);
       if (!validation.success) {
@@ -181,7 +195,15 @@ export class CartService {
         };
       }
 
-      await cartModel.removeItem(cart.id, validation.data.productId);
+      const deleted = await cartModel.removeItem(cart.id, validation.data.productId);
+
+      if (deleted.count === 0) {
+        return {
+          success: false,
+          message: "Item not found in cart",
+          status: 404,
+        };
+      }
 
       return {
         success: true,
@@ -198,9 +220,6 @@ export class CartService {
     }
   }
 
-  /**
-   * DELETE clear entire cart
-   */
   async clearCart(userId: string) {
     try {
       const cart = await cartModel.findByUserId(userId);

@@ -1,7 +1,6 @@
 export interface SellerProfile {
   storeName: string;
   bio?: string | null;
-  rating?: number;
 }
 
 export interface UpdateSellerProfileInput {

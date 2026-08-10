@@ -14,8 +14,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const authResult = await authMiddleware(req);
     if (!authResult.success) return authResult.response;
 
+    const userId = authResult.payload.userId;
     const body = await req.json();
-    const result = await orderService.updateStatus(id, body);
+    const result = await orderService.updateStatus(id, userId, body);
 
     return NextResponse.json(result, { status: result.status });
   } catch (error) {

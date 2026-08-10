@@ -8,7 +8,6 @@ import { authMiddleware } from "@/back-end/lib/auth-middleware/auth";
  */
 export async function DELETE(req: NextRequest) {
   try {
-
     const authResult = await authMiddleware(req);
 
     if (!authResult.success) {

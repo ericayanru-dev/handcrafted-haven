@@ -1,7 +1,15 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { formatCurrency, formatDate, loadOrderById, orderNumberFromId, paymentLabel, statusLabel, type OrderRecord } from "@/components/orders";
+import {
+  formatCurrency,
+  formatDate,
+  loadOrderById,
+  orderNumberFromId,
+  paymentLabel,
+  statusLabel,
+  type OrderRecord,
+} from "@/components/orders";
 import { Loading } from "@/components/state/loading";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";

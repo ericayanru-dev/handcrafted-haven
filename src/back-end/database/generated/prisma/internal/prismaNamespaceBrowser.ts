@@ -59,7 +59,8 @@ export const ModelName = {
   CartItem: 'CartItem',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  Review: 'Review'
+  Review: 'Review',
+  IdempotencyKey: 'IdempotencyKey'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -122,6 +123,7 @@ export type SellerProfileScalarFieldEnum = (typeof SellerProfileScalarFieldEnum)
 export const ProductScalarFieldEnum = {
   id: 'id',
   sellerId: 'sellerId',
+  idempotencyKey: 'idempotencyKey',
   title: 'title',
   description: 'description',
   price: 'price',
@@ -196,12 +198,34 @@ export const ReviewScalarFieldEnum = {
 export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
 
 
+export const IdempotencyKeyScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  userId: 'userId',
+  method: 'method',
+  path: 'path',
+  statusCode: 'statusCode',
+  response: 'response',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type IdempotencyKeyScalarFieldEnum = (typeof IdempotencyKeyScalarFieldEnum)[keyof typeof IdempotencyKeyScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -218,4 +242,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
