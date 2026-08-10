@@ -54,7 +54,12 @@ function normalizeItems(items: CartItem[]) {
 function toCartErrorMessage(status: number, payload: CartApiResponse) {
   const rawMessage = (payload.message ?? payload.error ?? "").trim().toLowerCase();
 
-  if (status === 401 || status === 403 || rawMessage.includes("unauthorized") || rawMessage.includes("forbidden")) {
+  if (
+    status === 401 ||
+    status === 403 ||
+    rawMessage.includes("unauthorized") ||
+    rawMessage.includes("forbidden")
+  ) {
     return "Please sign in to view and manage your cart.";
   }
 
@@ -67,6 +72,10 @@ function toCartErrorMessage(status: number, payload: CartApiResponse) {
   }
 
   return "We could not update your cart right now.";
+}
+
+function createIdempotencyKey() {
+  return crypto.randomUUID();
 }
 
 async function fetchCartEndpoint(path: string, init?: RequestInit) {
@@ -118,7 +127,7 @@ function fromApiItem(item: {
 }
 
 function fromApi(payload: CartApiResponse): CartSnapshot {
-  const items = payload.data && "items" in payload.data ? payload.data.items ?? [] : [];
+  const items = payload.data && "items" in payload.data ? (payload.data.items ?? []) : [];
 
   return {
     items: normalizeItems(items.map(fromApiItem)),
@@ -134,6 +143,9 @@ export async function loadCart(): Promise<CartSnapshot> {
 export async function addCartItem(input: AddCartItemInput): Promise<CartMutationResult> {
   await fetchCartEndpoint("/api/cart/add", {
     method: "POST",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(),
+    },
     body: JSON.stringify({
       productId: input.productId,
       quantity: input.quantity ?? 1,
@@ -147,9 +159,15 @@ export async function addCartItem(input: AddCartItemInput): Promise<CartMutation
   };
 }
 
-export async function setCartItemQuantity(productId: string, quantity: number): Promise<CartMutationResult> {
+export async function setCartItemQuantity(
+  productId: string,
+  quantity: number,
+): Promise<CartMutationResult> {
   await fetchCartEndpoint("/api/cart/update", {
     method: "PATCH",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(), // keep if backend requires it
+    },
     body: JSON.stringify({ productId, quantity }),
   });
 
@@ -163,6 +181,9 @@ export async function setCartItemQuantity(productId: string, quantity: number): 
 export async function removeCartItem(productId: string): Promise<CartMutationResult> {
   await fetchCartEndpoint("/api/cart/remove", {
     method: "DELETE",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(), // keep if backend requires it
+    },
     body: JSON.stringify({ productId }),
   });
 
@@ -176,6 +197,9 @@ export async function removeCartItem(productId: string): Promise<CartMutationRes
 export async function clearCartItems(): Promise<CartMutationResult> {
   await fetchCartEndpoint("/api/cart/clear", {
     method: "DELETE",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(), // keep if backend requires it
+    },
   });
 
   const snapshot = await loadCart();

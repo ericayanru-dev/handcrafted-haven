@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatCurrency, formatDate, loadOrderHistory, orderNumberFromId, statusLabel, type OrderRecord } from "@/components/orders";
+import {
+  formatCurrency,
+  formatDate,
+  loadOrderHistory,
+  orderNumberFromId,
+  statusLabel,
+  type OrderRecord,
+} from "@/components/orders";
 import { Loading } from "@/components/state/loading";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
@@ -55,7 +62,9 @@ export default function OrderHistoryPage() {
               <p className={styles.eyebrow}>Orders</p>
               <h1 className={styles.title}>Order history</h1>
             </div>
-            <p className={styles.lead}>Review your past orders and open any order for full details.</p>
+            <p className={styles.lead}>
+              Review your past orders and open any order for full details.
+            </p>
           </header>
 
           {error ? <p className={styles.error}>{error}</p> : null}

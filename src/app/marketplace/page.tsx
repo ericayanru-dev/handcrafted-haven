@@ -58,9 +58,7 @@ export default function MarketplacePage() {
   const [sortBy, setSortBy] = useState<SortValue>("newest");
 
   const priceRangeInvalid =
-    minPrice.trim().length > 0 &&
-    maxPrice.trim().length > 0 &&
-    Number(minPrice) > Number(maxPrice);
+    minPrice.trim().length > 0 && maxPrice.trim().length > 0 && Number(minPrice) > Number(maxPrice);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -186,7 +184,8 @@ export default function MarketplacePage() {
               <h1 className={styles.title}>Find handmade products from local makers</h1>
             </div>
             <p className={styles.lead}>
-              Search, filter, and sort listings to quickly find products that match your style and budget.
+              Search, filter, and sort listings to quickly find products that match your style and
+              budget.
             </p>
           </header>
 
@@ -202,7 +201,9 @@ export default function MarketplacePage() {
             />
           </div>
 
-          {isLoading ? <Loading message="Loading marketplace products..." title="Marketplace" /> : null}
+          {isLoading ? (
+            <Loading message="Loading marketplace products..." title="Marketplace" />
+          ) : null}
 
           {!isLoading && error ? <p className={styles.error}>{error}</p> : null}
 
@@ -227,7 +228,11 @@ export default function MarketplacePage() {
           ) : null}
 
           {!isLoading && !error && mappedProducts.length > 0 ? (
-            <ProductGrid isBusy={cartIsMutating} onAddToCart={handleAddToCart} products={mappedProducts} />
+            <ProductGrid
+              isBusy={cartIsMutating}
+              onAddToCart={handleAddToCart}
+              products={mappedProducts}
+            />
           ) : null}
         </section>
       </Container>
