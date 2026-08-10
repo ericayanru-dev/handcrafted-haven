@@ -104,7 +104,9 @@ export default function CheckoutPage() {
         setFormMessage(result.message);
       }
 
-      router.push(`/orders/confirmation?orderId=${encodeURIComponent(result.order.id)}`);
+      router.push(
+        `/payment?orderId=${encodeURIComponent(result.order.id)}&paymentMethod=${encodeURIComponent(paymentMethod)}`
+      );
     } catch {
       setFormError("Could not place your order right now. Please try again.");
     } finally {
