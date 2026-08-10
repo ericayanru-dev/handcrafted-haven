@@ -73,7 +73,7 @@ async function fetchReviewEndpoint(path: string, init?: RequestInit) {
 
 export async function loadProductReviews(productId: string, initialReviews: ProductReview[]) {
   try {
-    const payload = await fetchReviewEndpoint(`/api/review?productId=${encodeURIComponent(productId)}`);
+    const payload = await fetchReviewEndpoint(`/api/reviews/get-review/${encodeURIComponent(productId)}`);
     const reviews = payload.data?.reviews ?? initialReviews;
     return {
       reviews: sortReviews(reviews),
@@ -105,7 +105,7 @@ export async function saveProductReview(input: {
   });
 
   const payload = await fetchReviewEndpoint(
-    input.existingReviewId ? `/api/review/${input.existingReviewId}` : "/api/review",
+    input.existingReviewId ? `/api/reviews/update/${input.existingReviewId}` : "/api/reviews/create",
     {
       method: input.existingReviewId ? "PATCH" : "POST",
       body: JSON.stringify({
@@ -124,7 +124,7 @@ export async function saveProductReview(input: {
 }
 
 export async function deleteProductReview(input: { reviewId: string }) {
-  const payload = await fetchReviewEndpoint(`/api/review/${input.reviewId}`, {
+  const payload = await fetchReviewEndpoint(`/api/reviews/delete/${input.reviewId}`, {
     method: "DELETE",
   });
 
