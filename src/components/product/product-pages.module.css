@@ -119,6 +119,33 @@
   font-size: 0.92rem;
 }
 
+.stockBadge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.38rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.stockBadgeHealthy {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2f7d32;
+}
+
+.stockBadgeLow {
+  background: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+}
+
+.stockBadgeOut {
+  background: rgba(185, 28, 28, 0.1);
+  color: #b91c1c;
+}
+
 .cardPrice {
   color: var(--text-primary);
   font-family: var(--font-heading), sans-serif;

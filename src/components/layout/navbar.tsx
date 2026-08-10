@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { CartIcon } from "@/components/cart";
 import { Button, Container } from "@/components/ui";
 import styles from "./site-chrome.module.css";
 
@@ -48,6 +47,12 @@ export function Navbar() {
   const router = useRouter();
   const isLoginPage = pathname === "/login";
   const isRegisterPage = pathname === "/register";
+
+  function closeMenuOnSmallScreens() {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches) {
+      setMobileOpen(false);
+    }
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -131,12 +136,14 @@ export function Navbar() {
         </nav>
 
         <div className={styles.navActions}>
-          <CartIcon />
+          <Button href="/cart" size="sm" variant="secondary">
+            Cart
+          </Button>
           {!isCheckingAuth && sessionUser ? (
             <>
-              <a className={styles.userPill} href="/dashboard" title={sessionUser.email}>
-                {sessionUser.name}
-              </a>
+              <Button href="/dashboard" size="sm" variant="secondary">
+                Dashboard
+              </Button>
               <Button onClick={handleLogout} size="sm" variant="secondary">
                 Log out
               </Button>
@@ -154,7 +161,7 @@ export function Navbar() {
           <button
             aria-expanded={mobileOpen}
             aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
-            className={styles.menuButton}
+            className={mobileOpen ? `${styles.menuButton} ${styles.menuButtonVisible}` : styles.menuButton}
             onClick={() => setMobileOpen((current) => !current)}
             type="button"
           >
@@ -174,18 +181,18 @@ export function Navbar() {
               key={item.href}
               className={isActivePath(pathname, item.href) ? styles.mobileNavLinkActive : styles.mobileNavLink}
               href={item.href}
-              onClick={() => setMobileOpen(false)}
+              onClick={closeMenuOnSmallScreens}
             >
               {item.label}
             </a>
           ))}
           <div className={styles.mobileNavFooter}>
-            <Button href="/cart" fullWidth onClick={() => setMobileOpen(false)} variant="secondary">
+            <Button href="/cart" fullWidth onClick={closeMenuOnSmallScreens} variant="secondary">
               Cart
             </Button>
             {!isCheckingAuth && sessionUser ? (
               <>
-                <Button href="/dashboard" fullWidth onClick={() => setMobileOpen(false)} variant="secondary">
+                <Button href="/dashboard" fullWidth onClick={closeMenuOnSmallScreens} variant="secondary">
                   Dashboard
                 </Button>
                 <Button fullWidth onClick={handleLogout} variant="secondary">
@@ -197,7 +204,7 @@ export function Navbar() {
                 <Button
                   href="/login"
                   fullWidth
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMenuOnSmallScreens}
                   variant={isLoginPage ? "primary" : "secondary"}
                 >
                   Log in
@@ -205,7 +212,7 @@ export function Navbar() {
                 <Button
                   href="/register"
                   fullWidth
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMenuOnSmallScreens}
                   variant={isRegisterPage ? "primary" : "secondary"}
                 >
                   Sign up

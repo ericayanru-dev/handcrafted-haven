@@ -1,6 +1,27 @@
 import { Button, Card } from "@/components/ui";
 import styles from "./product-pages.module.css";
 
+function getStockStatus(stock: number) {
+  if (stock <= 0) {
+    return {
+      label: "Out of stock",
+      className: styles.stockBadgeOut,
+    };
+  }
+
+  if (stock <= 5) {
+    return {
+      label: "Low stock",
+      className: styles.stockBadgeLow,
+    };
+  }
+
+  return {
+    label: "In stock",
+    className: styles.stockBadgeHealthy,
+  };
+}
+
 export type ProductCardData = {
   id: string;
   title: string;
@@ -25,6 +46,8 @@ export function ProductCard({
   onAddToCart,
   addToCartDisabled,
 }: ProductCardProps) {
+  const stockStatus = getStockStatus(product.stock);
+
   return (
     <Card as="article" className={styles.card}>
       {product.imageUrl ? (
@@ -44,6 +67,8 @@ export function ProductCard({
         <span className={styles.cardPrice}>{product.price}</span>
         <span>{product.stock} in stock</span>
       </div>
+
+      <p className={`${styles.stockBadge} ${stockStatus.className}`}>{stockStatus.label}</p>
 
       {product.storeName ? <p className={styles.hint}>Sold by {product.storeName}</p> : null}
 

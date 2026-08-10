@@ -81,10 +81,8 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [product, setProduct] = useState<ProductDetailsResponse["data"]>(undefined);
-  const [addedMessage, setAddedMessage] = useState("");
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
-  const [reviewsMode, setReviewsMode] = useState<"api" | "local">("local");
   const [reviewNotice, setReviewNotice] = useState("");
   const [reviewError, setReviewError] = useState("");
   const [isSavingReview, setIsSavingReview] = useState(false);
@@ -192,7 +190,9 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       }
 
       setReviews(result.reviews);
-      setReviewsMode(result.mode);
+      if (result.message) {
+        setReviewError(result.message);
+      }
     }
 
     loadReviews();
@@ -224,6 +224,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
     return currentUserReview;
   }, [currentUserReview, editingReviewId, reviews]);
+  const cartMessageIsError = useMemo(
+    () => /fail|error|could not|unable|unauthorized|forbidden/i.test(cartMessage),
+    [cartMessage]
+  );
 
   async function handleAddToCart() {
     if (!product) {
@@ -240,7 +244,6 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       stock: product.stock,
       quantity: 1,
     });
-    setAddedMessage(`${product.title} added to cart.`);
   }
 
   async function handleSaveReview(input: ReviewFormInput) {
@@ -270,7 +273,6 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
           (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime()
         );
       });
-      setReviewsMode(result.mode);
       setReviewNotice(result.message);
       setEditingReviewId(null);
     } catch {
@@ -296,13 +298,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
     try {
       const result = await deleteProductReview({
-        productId: product.id,
         reviewId: review.id,
-        userId: sessionUser.id,
       });
 
       setReviews((current) => current.filter((item) => item.id !== review.id));
-      setReviewsMode(result.mode);
       setReviewNotice(result.message);
       setEditingReviewId(null);
     } catch {
@@ -374,8 +373,8 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 <span>{reviews.length} review{reviews.length === 1 ? "" : "s"}</span>
               </div>
 
-              {addedMessage || cartMessage ? (
-                <p className={styles.success}>{addedMessage || cartMessage}</p>
+              {cartMessage ? (
+                <p className={cartMessageIsError ? styles.error : styles.success}>{cartMessage}</p>
               ) : null}
 
               <div className={styles.actions}>
@@ -411,12 +410,6 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </span>
               </div>
             </div>
-
-            {reviewsMode === "local" ? (
-              <p className={reviewStyles.reviewInfo}>
-                Review actions are running in local preview mode until dedicated backend review APIs are connected.
-              </p>
-            ) : null}
 
             {reviewNotice ? <p className={reviewStyles.reviewSuccess}>{reviewNotice}</p> : null}
             {reviewError ? <p className={reviewStyles.reviewError}>{reviewError}</p> : null}

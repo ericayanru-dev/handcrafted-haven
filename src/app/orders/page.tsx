@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatCurrency, formatDate, loadOrderHistory, orderNumberFromId, statusLabel, type OrderRecord } from "@/components/orders";
+import {
+  formatCurrency,
+  formatDate,
+  loadOrderHistory,
+  orderNumberFromId,
+  statusLabel,
+  type OrderRecord,
+} from "@/components/orders";
 import { Loading } from "@/components/state/loading";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
@@ -9,7 +16,6 @@ import styles from "@/components/orders/orders.module.css";
 export default function OrderHistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [mode, setMode] = useState<"api" | "local">("local");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -25,7 +31,6 @@ export default function OrderHistoryPage() {
           return;
         }
         setOrders(result.orders);
-        setMode(result.mode);
       } catch {
         if (isMounted) {
           setError("Could not load order history right now.");
@@ -57,12 +62,10 @@ export default function OrderHistoryPage() {
               <p className={styles.eyebrow}>Orders</p>
               <h1 className={styles.title}>Order history</h1>
             </div>
-            <p className={styles.lead}>Review your past orders and open any order for full details.</p>
+            <p className={styles.lead}>
+              Review your past orders and open any order for full details.
+            </p>
           </header>
-
-          {mode === "local" ? (
-            <p className={styles.info}>Order history is running in local mode until backend APIs are ready.</p>
-          ) : null}
 
           {error ? <p className={styles.error}>{error}</p> : null}
 

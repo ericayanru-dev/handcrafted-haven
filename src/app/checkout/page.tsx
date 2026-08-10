@@ -3,7 +3,12 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart";
-import { createOrder, formatCurrency, type PaymentMethod, type ShippingAddress } from "@/components/orders";
+import {
+  createOrder,
+  formatCurrency,
+  type PaymentMethod,
+  type ShippingAddress,
+} from "@/components/orders";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
 
@@ -50,7 +55,7 @@ function validateShipping(shipping: ShippingAddress): FieldErrors {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, itemCount, subtotal, syncMode, clearCart, isMutating } = useCart();
+  const { items, itemCount, subtotal, clearCart, isMutating } = useCart();
 
   const [shipping, setShipping] = useState<ShippingAddress>(defaultShipping);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CARD");
@@ -96,7 +101,6 @@ export default function CheckoutPage() {
         items,
         paymentMethod,
         shipping,
-        sourceMode: syncMode,
       });
 
       await clearCart();
@@ -105,7 +109,9 @@ export default function CheckoutPage() {
         setFormMessage(result.message);
       }
 
-      router.push(`/orders/confirmation?orderId=${encodeURIComponent(result.order.id)}`);
+      router.push(
+        `/payment?orderId=${encodeURIComponent(result.order.id)}&paymentMethod=${encodeURIComponent(paymentMethod)}`,
+      );
     } catch {
       setFormError("Could not place your order right now. Please try again.");
     } finally {
@@ -140,14 +146,10 @@ export default function CheckoutPage() {
               <p className={styles.eyebrow}>Checkout</p>
               <h1 className={styles.title}>Place your order</h1>
             </div>
-            <p className={styles.lead}>Fill in your shipping details and confirm the order summary.</p>
-          </header>
-
-          {syncMode === "local" ? (
-            <p className={styles.info}>
-              Checkout is running in frontend mode while backend order APIs are in progress.
+            <p className={styles.lead}>
+              Fill in your shipping details and confirm the order summary.
             </p>
-          ) : null}
+          </header>
 
           {formMessage ? <p className={styles.info}>{formMessage}</p> : null}
 
@@ -162,7 +164,9 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("fullName", event.target.value)}
                     value={shipping.fullName}
                   />
-                  {fieldErrors.fullName ? <p className={styles.error}>{fieldErrors.fullName}</p> : null}
+                  {fieldErrors.fullName ? (
+                    <p className={styles.error}>{fieldErrors.fullName}</p>
+                  ) : null}
                 </label>
 
                 <label className={styles.fieldGroup} htmlFor="email">
@@ -177,7 +181,10 @@ export default function CheckoutPage() {
                   {fieldErrors.email ? <p className={styles.error}>{fieldErrors.email}</p> : null}
                 </label>
 
-                <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="addressLine1">
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="addressLine1"
+                >
                   <span className={styles.fieldLabel}>Address line 1</span>
                   <input
                     className={styles.field}
@@ -185,10 +192,15 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("addressLine1", event.target.value)}
                     value={shipping.addressLine1}
                   />
-                  {fieldErrors.addressLine1 ? <p className={styles.error}>{fieldErrors.addressLine1}</p> : null}
+                  {fieldErrors.addressLine1 ? (
+                    <p className={styles.error}>{fieldErrors.addressLine1}</p>
+                  ) : null}
                 </label>
 
-                <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="addressLine2">
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="addressLine2"
+                >
                   <span className={styles.fieldLabel}>Address line 2 (optional)</span>
                   <input
                     className={styles.field}
@@ -228,7 +240,9 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("postalCode", event.target.value)}
                     value={shipping.postalCode}
                   />
-                  {fieldErrors.postalCode ? <p className={styles.error}>{fieldErrors.postalCode}</p> : null}
+                  {fieldErrors.postalCode ? (
+                    <p className={styles.error}>{fieldErrors.postalCode}</p>
+                  ) : null}
                 </label>
 
                 <label className={styles.fieldGroup} htmlFor="country">
@@ -239,10 +253,15 @@ export default function CheckoutPage() {
                     onChange={(event) => updateField("country", event.target.value)}
                     value={shipping.country}
                   />
-                  {fieldErrors.country ? <p className={styles.error}>{fieldErrors.country}</p> : null}
+                  {fieldErrors.country ? (
+                    <p className={styles.error}>{fieldErrors.country}</p>
+                  ) : null}
                 </label>
 
-                <label className={`${styles.fieldGroup} ${styles.fieldGroupFull}`} htmlFor="paymentMethod">
+                <label
+                  className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}
+                  htmlFor="paymentMethod"
+                >
                   <span className={styles.fieldLabel}>Payment method</span>
                   <select
                     className={styles.select}
@@ -256,7 +275,9 @@ export default function CheckoutPage() {
                   </select>
                 </label>
 
-                {formError ? <p className={`${styles.error} ${styles.fieldGroupFull}`}>{formError}</p> : null}
+                {formError ? (
+                  <p className={`${styles.error} ${styles.fieldGroupFull}`}>{formError}</p>
+                ) : null}
 
                 <div className={`${styles.actions} ${styles.fieldGroupFull}`}>
                   <Button disabled={isSubmitting || isMutating} type="submit">

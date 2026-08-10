@@ -114,7 +114,7 @@ export async function proxy(request: NextRequest) {
 }
 
 // Matcher
-export const matcherConfig = {
+export const config = {
   matcher: [
     "/dashboard/:path*",
     "/dashboard",

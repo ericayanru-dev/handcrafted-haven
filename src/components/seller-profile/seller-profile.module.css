@@ -104,6 +104,33 @@
   gap: 0.4rem;
 }
 
+.productStockBadge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.34rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.productStockHealthy {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2f7d32;
+}
+
+.productStockLow {
+  background: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+}
+
+.productStockOut {
+  background: rgba(185, 28, 28, 0.1);
+  color: #b91c1c;
+}
+
 .productCategory {
   color: var(--accent);
   font-size: 0.82rem;

@@ -1,8 +1,5 @@
 import type { AddCartItemInput, CartItem, CartMutationResult, CartSnapshot } from "./cart-types";
 
-const CART_STORAGE_KEY = "handcrafted-haven-cart-v1";
-const CART_API_ENABLED = process.env.NEXT_PUBLIC_ENABLE_CART_API !== "0";
-
 type CartApiResponse = {
   success?: boolean;
   data?:
@@ -44,10 +41,6 @@ type CartApiResponse = {
   error?: string;
 };
 
-function canUseWindow() {
-  return typeof window !== "undefined";
-}
-
 function normalizeItems(items: CartItem[]) {
   return items
     .map((item) => ({
@@ -58,79 +51,31 @@ function normalizeItems(items: CartItem[]) {
     .filter((item) => item.productId && item.title);
 }
 
-function readLocalCart(): CartItem[] {
-  if (!canUseWindow()) {
-    return [];
+function toCartErrorMessage(status: number, payload: CartApiResponse) {
+  const rawMessage = (payload.message ?? payload.error ?? "").trim().toLowerCase();
+
+  if (
+    status === 401 ||
+    status === 403 ||
+    rawMessage.includes("unauthorized") ||
+    rawMessage.includes("forbidden")
+  ) {
+    return "Please sign in to view and manage your cart.";
   }
 
-  try {
-    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
-    if (!raw) {
-      return [];
-    }
-
-    const parsed = JSON.parse(raw) as CartItem[];
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return normalizeItems(parsed);
-  } catch {
-    return [];
-  }
-}
-
-function writeLocalCart(items: CartItem[]) {
-  if (!canUseWindow()) {
-    return;
+  if (status >= 500) {
+    return "We are having trouble loading your cart right now. Please try again shortly.";
   }
 
-  window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(normalizeItems(items)));
-}
-
-function upsertLocalItem(input: AddCartItemInput) {
-  const items = readLocalCart();
-  const quantityToAdd = Math.max(1, Number(input.quantity) || 1);
-  const existing = items.find((item) => item.productId === input.productId);
-
-  if (existing) {
-    existing.quantity += quantityToAdd;
-  } else {
-    items.push({
-      productId: input.productId,
-      title: input.title,
-      price: Number(input.price) || 0,
-      quantity: quantityToAdd,
-      imageUrl: input.imageUrl,
-      category: input.category,
-      storeName: input.storeName,
-      stock: input.stock,
-    });
+  if (payload.message || payload.error) {
+    return payload.message ?? payload.error ?? "We could not update your cart right now.";
   }
 
-  writeLocalCart(items);
-  return items;
+  return "We could not update your cart right now.";
 }
 
-function updateLocalQuantity(productId: string, quantity: number) {
-  const items = readLocalCart();
-  const nextQuantity = Math.max(1, Number(quantity) || 1);
-  const nextItems = items.map((item) =>
-    item.productId === productId ? { ...item, quantity: nextQuantity } : item
-  );
-  writeLocalCart(nextItems);
-  return nextItems;
-}
-
-function removeLocalItem(productId: string) {
-  const nextItems = readLocalCart().filter((item) => item.productId !== productId);
-  writeLocalCart(nextItems);
-  return nextItems;
-}
-
-function clearLocalItems() {
-  writeLocalCart([]);
-  return [];
+function createIdempotencyKey() {
+  return crypto.randomUUID();
 }
 
 async function fetchCartEndpoint(path: string, init?: RequestInit) {
@@ -150,7 +95,7 @@ async function fetchCartEndpoint(path: string, init?: RequestInit) {
   }
 
   if (!response.ok || !payload.success) {
-    throw new Error(payload.message ?? payload.error ?? `Cart request failed (${response.status})`);
+    throw new Error(toCartErrorMessage(response.status, payload));
   }
 
   return payload;
@@ -182,7 +127,7 @@ function fromApiItem(item: {
 }
 
 function fromApi(payload: CartApiResponse): CartSnapshot {
-  const items = payload.data && "items" in payload.data ? payload.data.items ?? [] : [];
+  const items = payload.data && "items" in payload.data ? (payload.data.items ?? []) : [];
 
   return {
     items: normalizeItems(items.map(fromApiItem)),
@@ -191,138 +136,75 @@ function fromApi(payload: CartApiResponse): CartSnapshot {
 }
 
 export async function loadCart(): Promise<CartSnapshot> {
-  if (!CART_API_ENABLED) {
-    return {
-      items: readLocalCart(),
-      mode: "local",
-    };
-  }
-
-  try {
-    const payload = await fetchCartEndpoint("/api/cart/get");
-    return fromApi(payload);
-  } catch {
-    return {
-      items: readLocalCart(),
-      mode: "local",
-    };
-  }
+  const payload = await fetchCartEndpoint("/api/cart/get");
+  return fromApi(payload);
 }
 
 export async function addCartItem(input: AddCartItemInput): Promise<CartMutationResult> {
-  if (!CART_API_ENABLED) {
-    return {
-      items: upsertLocalItem(input),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+  await fetchCartEndpoint("/api/cart/add", {
+    method: "POST",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(),
+    },
+    body: JSON.stringify({
+      productId: input.productId,
+      quantity: input.quantity ?? 1,
+    }),
+  });
 
-  try {
-    await fetchCartEndpoint("/api/cart/add", {
-      method: "POST",
-      body: JSON.stringify({
-        productId: input.productId,
-        quantity: input.quantity ?? 1,
-      }),
-    });
-
-    const snapshot = await loadCart();
-    return {
-      ...snapshot,
-      message: "Item added to cart.",
-    };
-  } catch {
-    return {
-      items: upsertLocalItem(input),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Item added to cart.",
+  };
 }
 
-export async function setCartItemQuantity(productId: string, quantity: number): Promise<CartMutationResult> {
-  if (!CART_API_ENABLED) {
-    return {
-      items: updateLocalQuantity(productId, quantity),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+export async function setCartItemQuantity(
+  productId: string,
+  quantity: number,
+): Promise<CartMutationResult> {
+  await fetchCartEndpoint("/api/cart/update", {
+    method: "PATCH",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(), // keep if backend requires it
+    },
+    body: JSON.stringify({ productId, quantity }),
+  });
 
-  try {
-    await fetchCartEndpoint("/api/cart/update", {
-      method: "PATCH",
-      body: JSON.stringify({ productId, quantity }),
-    });
-
-    const snapshot = await loadCart();
-    return {
-      ...snapshot,
-      message: "Cart updated.",
-    };
-  } catch {
-    return {
-      items: updateLocalQuantity(productId, quantity),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Cart updated.",
+  };
 }
 
 export async function removeCartItem(productId: string): Promise<CartMutationResult> {
-  if (!CART_API_ENABLED) {
-    return {
-      items: removeLocalItem(productId),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+  await fetchCartEndpoint("/api/cart/remove", {
+    method: "DELETE",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(), // keep if backend requires it
+    },
+    body: JSON.stringify({ productId }),
+  });
 
-  try {
-    await fetchCartEndpoint("/api/cart/remove", {
-      method: "DELETE",
-      body: JSON.stringify({ productId }),
-    });
-
-    const snapshot = await loadCart();
-    return {
-      ...snapshot,
-      message: "Item removed from cart.",
-    };
-  } catch {
-    return {
-      items: removeLocalItem(productId),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Item removed from cart.",
+  };
 }
 
 export async function clearCartItems(): Promise<CartMutationResult> {
-  if (!CART_API_ENABLED) {
-    return {
-      items: clearLocalItems(),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+  await fetchCartEndpoint("/api/cart/clear", {
+    method: "DELETE",
+    headers: {
+      "Idempotency-Key": createIdempotencyKey(), // keep if backend requires it
+    },
+  });
 
-  try {
-    await fetchCartEndpoint("/api/cart/clear", {
-      method: "DELETE",
-    });
-
-    const snapshot = await loadCart();
-    return {
-      ...snapshot,
-      message: "Cart cleared.",
-    };
-  } catch {
-    return {
-      items: clearLocalItems(),
-      mode: "local",
-      message: "Saved to local cart.",
-    };
-  }
+  const snapshot = await loadCart();
+  return {
+    ...snapshot,
+    message: "Cart cleared.",
+  };
 }

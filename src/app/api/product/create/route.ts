@@ -16,13 +16,35 @@ export async function POST(req: NextRequest) {
     }
 
     const { payload } = authResult;
+
+    const idempotencyKey = req.headers.get("Idempotency-Key");
+
+    if (!idempotencyKey) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Idempotency-Key header is required",
+        },
+        { status: 400 },
+      );
+    }
+
     const body = await req.json();
 
-    const result = await productService.create(payload.userId, body);
+    const result = await productService.create(payload.userId, body, idempotencyKey);
 
-    return NextResponse.json(result, { status: result.status });
+    return NextResponse.json(result, {
+      status: result.status,
+    });
   } catch (error) {
     console.error("[POST /api/products]", error);
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Internal server error",
+      },
+      { status: 500 },
+    );
   }
 }
