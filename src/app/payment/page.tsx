@@ -4,7 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card, Container } from "@/components/ui";
 import { Loading } from "@/components/state/loading";
-import { formatCurrency, loadOrderById, paymentLabel, statusLabel, type OrderRecord } from "@/components/orders";
+import {
+  formatCurrency,
+  loadOrderById,
+  paymentLabel,
+  statusLabel,
+  type OrderRecord,
+} from "@/components/orders";
 import styles from "@/components/payment/payment.module.css";
 
 type UpdateStatusResponse = {
@@ -38,7 +44,8 @@ export default function PaymentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
-  const paymentMethodParam = searchParams.get("paymentMethod") as OrderRecord["paymentMethod"] | null;
+  const paymentMethodParam = searchParams.get("paymentMethod") as
+    OrderRecord["paymentMethod"] | null;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isCompleting, setIsCompleting] = useState(false);
@@ -83,7 +90,7 @@ export default function PaymentPage() {
       }
     }
 
-    load();
+    void load();
 
     return () => {
       isMounted = false;
@@ -149,7 +156,7 @@ export default function PaymentPage() {
           <Card className={styles.statusCard}>
             <div>
               <p className={styles.eyebrow}>Payment</p>
-              <h1 className={styles.statusTitle}>We couldn't load the payment page.</h1>
+              <h1 className={styles.statusTitle}>We couldn&apos;t load the payment page.</h1>
             </div>
             <p className={styles.error}>{error || "Please try again."}</p>
             <div className={styles.actions}>
@@ -174,7 +181,8 @@ export default function PaymentPage() {
               <h1 className={styles.title}>Review and complete payment</h1>
             </div>
             <p className={styles.lead}>
-              Confirm your order total, check the payment status, and finish the order when you're ready.
+              Confirm your order total, check the payment status, and finish the order when
+              you&apos;re ready.
             </p>
           </header>
 
@@ -188,7 +196,9 @@ export default function PaymentPage() {
                 <h2 className={styles.statusTitle}>Payment status: {statusLabel(order.status)}</h2>
               </div>
 
-              <span className={`${styles.statusPill} ${statusToneClass}`}>{statusLabel(order.status)}</span>
+              <span className={`${styles.statusPill} ${statusToneClass}`}>
+                {statusLabel(order.status)}
+              </span>
 
               <dl className={styles.metaList}>
                 <div className={styles.metaRow}>
@@ -215,8 +225,8 @@ export default function PaymentPage() {
               </div>
 
               <p className={styles.statusText}>
-                This page uses the current order record and status endpoint so the payment flow can be tested
-                before the gateway integration lands.
+                This page uses the current order record and status endpoint so the payment flow can
+                be tested before the gateway integration lands.
               </p>
             </Card>
 

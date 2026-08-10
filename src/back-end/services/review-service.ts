@@ -7,13 +7,15 @@ import {
   productIdQuerySchema,
 } from "@/back-end/lib/validation/review-validations";
 import { formatZodError } from "@/back-end/lib/utils/helper";
-import type { CreateReviewInput, UpdateReviewInput } from "@/back-end/types/review-types";
+import { isDatabaseUnavailableError, databaseErrorResponse } from "@/back-end/lib/utils/db-error";
 
 export class ReviewService {
   /**
    * Create review
+   * - transaction for create + stats
+   * - duplicate → return existing review (soft idempotency)
    */
-  async create(userId: string, body: CreateReviewInput) {
+  async create(userId: string, body: unknown) {
     try {
       const validation = createReviewSchema.safeParse(body);
       if (!validation.success) {
@@ -35,37 +37,63 @@ export class ReviewService {
         };
       }
 
-      // Prevent duplicate review
+      // Already reviewed → return existing (safe retry)
       const existing = await reviewModel.findByUserAndProduct(userId, productId);
       if (existing) {
+        const stats = await reviewModel.getAverageRating(productId);
+
         return {
-          success: false,
-          message: "You have already reviewed this product",
-          status: 409,
+          success: true,
+          data: {
+            review: existing,
+            averageRating: stats.average,
+            reviewCount: stats.count,
+          },
+          message: "Review already exists",
+          status: 200, // not 201 — already created
         };
       }
 
-      const review = await reviewModel.create(userId, {
+      const result = await reviewModel.createWithStats(userId, {
         productId,
         rating,
         comment,
       });
 
-      const stats = await reviewModel.getAverageRating(productId);
-
       return {
         success: true,
         data: {
-          review,
-          averageRating: stats.average,
-          reviewCount: stats.count,
+          review: result.review,
+          averageRating: result.average,
+          reviewCount: result.count,
         },
         message: "Review created successfully",
         status: 201,
       };
     } catch (error: any) {
-      // Prisma unique constraint (race condition)
+      // Race: two creates at once
       if (error?.code === "P2002") {
+        try {
+          const productId = (body as any)?.productId;
+          const existing = await reviewModel.findByUserAndProduct(userId, productId);
+          const stats = await reviewModel.getAverageRating(productId);
+
+          if (existing) {
+            return {
+              success: true,
+              data: {
+                review: existing,
+                averageRating: stats.average,
+                reviewCount: stats.count,
+              },
+              message: "Review already exists",
+              status: 200,
+            };
+          }
+        } catch {
+          // fall through
+        }
+
         return {
           success: false,
           message: "You have already reviewed this product",
@@ -74,6 +102,11 @@ export class ReviewService {
       }
 
       console.error("[ReviewService.create]", error);
+
+      if (isDatabaseUnavailableError(error)) {
+        return databaseErrorResponse();
+      }
+
       return {
         success: false,
         message: "Failed to create review",
@@ -82,9 +115,6 @@ export class ReviewService {
     }
   }
 
-  /**
-   * Get reviews for a product
-   */
   async getByProductId(productId: string) {
     try {
       const validation = productIdQuerySchema.safeParse({ productId });
@@ -119,6 +149,11 @@ export class ReviewService {
       };
     } catch (error) {
       console.error("[ReviewService.getByProductId]", error);
+
+      if (isDatabaseUnavailableError(error)) {
+        return databaseErrorResponse();
+      }
+
       return {
         success: false,
         message: "Failed to fetch reviews",
@@ -127,10 +162,7 @@ export class ReviewService {
     }
   }
 
-  /**
-   * Update own review
-   */
-  async update(id: string, userId: string, body: UpdateReviewInput) {
+  async update(id: string, userId: string, body: unknown) {
     try {
       const idValidation = reviewIdParamSchema.safeParse({ id });
       if (!idValidation.success) {
@@ -167,22 +199,29 @@ export class ReviewService {
         };
       }
 
-      const updated = await reviewModel.update(idValidation.data.id, bodyValidation.data);
-
-      const stats = await reviewModel.getAverageRating(review.productId);
+      const result = await reviewModel.updateWithStats(
+        idValidation.data.id,
+        review.productId,
+        bodyValidation.data,
+      );
 
       return {
         success: true,
         data: {
-          review: updated,
-          averageRating: stats.average,
-          reviewCount: stats.count,
+          review: result.review,
+          averageRating: result.average,
+          reviewCount: result.count,
         },
         message: "Review updated successfully",
         status: 200,
       };
     } catch (error) {
       console.error("[ReviewService.update]", error);
+
+      if (isDatabaseUnavailableError(error)) {
+        return databaseErrorResponse();
+      }
+
       return {
         success: false,
         message: "Failed to update review",
@@ -191,9 +230,6 @@ export class ReviewService {
     }
   }
 
-  /**
-   * Delete own review
-   */
   async delete(id: string, userId: string) {
     try {
       const validation = reviewIdParamSchema.safeParse({ id });
@@ -222,10 +258,7 @@ export class ReviewService {
         };
       }
 
-      const productId = review.productId;
-      await reviewModel.delete(validation.data.id);
-
-      const stats = await reviewModel.getAverageRating(productId);
+      const stats = await reviewModel.deleteWithStats(validation.data.id, review.productId);
 
       return {
         success: true,
@@ -238,6 +271,11 @@ export class ReviewService {
       };
     } catch (error) {
       console.error("[ReviewService.delete]", error);
+
+      if (isDatabaseUnavailableError(error)) {
+        return databaseErrorResponse();
+      }
+
       return {
         success: false,
         message: "Failed to delete review",

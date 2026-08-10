@@ -9,6 +9,7 @@ import {
 import { formatZodError, deleteBlobFile } from "@/back-end/lib/utils/helper";
 
 import type { ProductsQuerySchema, Product, UpdateProductInput } from "../types/product-types";
+import type { Prisma } from "../database/generated/prisma/client";
 
 export class ProductService {
   /**
@@ -113,11 +114,16 @@ export class ProductService {
     }
   }
 
-  /**
-   * Create product
-   */
-  async create(userId: string, body: Product) {
+  async create(userId: string, body: Product, idempotencyKey: string) {
     try {
+      if (!idempotencyKey || idempotencyKey.trim().length === 0) {
+        return {
+          success: false,
+          message: "Idempotency-Key is required",
+          status: 400,
+        };
+      }
+
       const validation = createProductSchema.safeParse(body);
 
       if (!validation.success) {
@@ -128,7 +134,6 @@ export class ProductService {
         };
       }
 
-      // Find the seller profile of the authenticated user
       const sellerProfile = await sellerProfileModel.findByUserId(userId);
 
       if (!sellerProfile) {
@@ -139,7 +144,19 @@ export class ProductService {
         };
       }
 
-      const product = await productModel.create(sellerProfile.id, validation.data);
+      // Check whether this request was already processed.
+      const existing = await productModel.findByIdempotencyKey(sellerProfile.id, idempotencyKey);
+
+      if (existing) {
+        return {
+          success: true,
+          data: existing,
+          message: "Product already created",
+          status: 200,
+        };
+      }
+
+      const product = await productModel.create(sellerProfile.id, validation.data, idempotencyKey);
 
       return {
         success: true,
@@ -149,6 +166,36 @@ export class ProductService {
       };
     } catch (error) {
       console.error("[ProductService.create]", error);
+
+      const prismaError = error as Prisma.PrismaClientKnownRequestError;
+
+      // Another simultaneous request may have created it first.
+      if (prismaError.code === "P2002") {
+        const sellerProfile = await sellerProfileModel.findByUserId(userId);
+
+        if (sellerProfile) {
+          const existing = await productModel.findByIdempotencyKey(
+            sellerProfile.id,
+            idempotencyKey
+          );
+
+          if (existing) {
+            return {
+              success: true,
+              data: existing,
+              message: "Product already created",
+              status: 200,
+            };
+          }
+        }
+
+        return {
+          success: false,
+          message: "Duplicate request",
+          status: 409,
+        };
+      }
+
       return {
         success: false,
         message: "Failed to create product",

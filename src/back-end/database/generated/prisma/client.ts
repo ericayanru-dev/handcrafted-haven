@@ -86,3 +86,8 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type Review = Prisma.ReviewModel
+/**
+ * Model IdempotencyKey
+ * 
+ */
+export type IdempotencyKey = Prisma.IdempotencyKeyModel

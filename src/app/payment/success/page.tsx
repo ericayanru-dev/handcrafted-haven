@@ -4,13 +4,21 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button, Card, Container } from "@/components/ui";
 import { Loading } from "@/components/state/loading";
-import { formatCurrency, loadOrderById, paymentLabel, statusLabel, type OrderRecord, orderNumberFromId } from "@/components/orders";
+import {
+  formatCurrency,
+  loadOrderById,
+  paymentLabel,
+  statusLabel,
+  type OrderRecord,
+  orderNumberFromId,
+} from "@/components/orders";
 import styles from "@/components/payment/payment.module.css";
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
-  const paymentMethodParam = searchParams.get("paymentMethod") as OrderRecord["paymentMethod"] | null;
+  const paymentMethodParam = searchParams.get("paymentMethod") as
+    OrderRecord["paymentMethod"] | null;
 
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState<OrderRecord | null>(null);
