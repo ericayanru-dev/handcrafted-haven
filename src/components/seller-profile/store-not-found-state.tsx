@@ -10,14 +10,14 @@ export function StoreNotFoundState() {
       </div>
 
       <p className={styles.statusText}>
-        You can keep using the marketplace as a buyer. If you want to sell products,
+        You can continue shopping anytime. If you want to start selling,
         create your seller profile first.
       </p>
 
       <div className={styles.statusActions}>
         <Button href="/dashboard/seller-profile/create">Create seller profile</Button>
         <Button href="/" variant="secondary">
-          Continue as buyer
+          Continue shopping
         </Button>
       </div>
     </Card>

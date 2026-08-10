@@ -9,7 +9,6 @@ import styles from "@/components/orders/orders.module.css";
 export default function OrderHistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [mode, setMode] = useState<"api" | "local">("local");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -25,7 +24,6 @@ export default function OrderHistoryPage() {
           return;
         }
         setOrders(result.orders);
-        setMode(result.mode);
       } catch {
         if (isMounted) {
           setError("Could not load order history right now.");
@@ -59,10 +57,6 @@ export default function OrderHistoryPage() {
             </div>
             <p className={styles.lead}>Review your past orders and open any order for full details.</p>
           </header>
-
-          {mode === "local" ? (
-            <p className={styles.info}>Order history is running in local mode until backend APIs are ready.</p>
-          ) : null}
 
           {error ? <p className={styles.error}>{error}</p> : null}
 

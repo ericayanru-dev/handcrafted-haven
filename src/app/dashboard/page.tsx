@@ -78,7 +78,6 @@ export default function SellerDashboardPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [sellerPayload, setSellerPayload] = useState<SellerApiResponse["data"]>(undefined);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [ordersMode, setOrdersMode] = useState<"api" | "local">("local");
 
   useEffect(() => {
     let isMounted = true;
@@ -116,7 +115,6 @@ export default function SellerDashboardPage() {
         }
 
         setOrders(ordersResult.orders);
-        setOrdersMode(ordersResult.mode);
       } catch {
         if (isMounted) {
           setErrorMessage("Could not load seller dashboard right now.");
@@ -252,7 +250,7 @@ export default function SellerDashboardPage() {
     {
       label: "Revenue",
       value: formatCurrency(derived.sales.revenue),
-      note: ordersMode === "local" ? "Local estimate until dashboard API is connected." : "Synced from API.",
+      note: "Updated from your latest sales activity.",
     },
     {
       label: "Orders",
@@ -262,12 +260,12 @@ export default function SellerDashboardPage() {
     {
       label: "Units sold",
       value: String(derived.sales.soldUnits),
-      note: "Combined quantity from orders linked to your listings.",
+      note: "Total items sold across orders that include your products.",
     },
     {
       label: "Average order",
       value: formatCurrency(derived.sales.averageOrderValue),
-      note: "Average value per order containing your products.",
+      note: "Average order value when your products are included.",
     },
   ];
 
@@ -286,12 +284,6 @@ export default function SellerDashboardPage() {
           </header>
 
           <DashboardNavigation />
-
-          {ordersMode === "local" ? (
-            <p className={styles.info}>
-              Sales and order stats are in local preview mode while backend dashboard endpoints are being implemented.
-            </p>
-          ) : null}
 
           <SellerOverview {...derived.seller} />
 

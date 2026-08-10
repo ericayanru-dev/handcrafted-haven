@@ -22,18 +22,20 @@ export function SellerOverview({
   productCount,
   totalStock,
 }: SellerOverviewProps) {
+  const yearsSellingLabel = yearsSelling === 1 ? "1 year selling" : `${yearsSelling} years selling`;
+
   return (
     <Card className={styles.overviewCard}>
       <div className={styles.overviewTop}>
         <div>
           <p className={styles.sectionEyebrow}>Seller overview</p>
           <h2 className={styles.sectionTitle}>{storeName}</h2>
-          <p className={styles.sectionText}>Owner: {ownerName}</p>
+          <p className={styles.sectionText}>Managed by {ownerName}</p>
         </div>
 
         <div className={styles.badges}>
           <span className={styles.badge}>Rating: {rating}</span>
-          <span className={styles.badge}>{yearsSelling} year(s) selling</span>
+          <span className={styles.badge}>{yearsSellingLabel}</span>
         </div>
       </div>
 

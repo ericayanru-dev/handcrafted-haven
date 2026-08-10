@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loading } from "@/components/state/loading";
+import { SkeletonLoader } from "@/components/state/skeleton";
 
 const LOADING_DELAY_MS = 500;
 
@@ -22,5 +22,5 @@ export default function LoadingPage() {
     return null;
   }
 
-  return <Loading />;
+  return <SkeletonLoader title="Loading Handcrafted Haven" />;
 }
