@@ -368,8 +368,13 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               <p className={styles.lead}>{product.description}</p>
               <div className={styles.detailMeta}>
                 <span>{product.stock} in stock</span>
-                <span>Store: {product.seller?.storeName ?? "Unknown"}</span>
-                <span>Seller: {product.seller?.user?.name ?? "Unknown"}</span>
+                {product.seller ? (
+                  <a href={`/sellers/${product.seller.id}`} className={styles.sellerLink}>
+                    Sold by {product.seller.storeName}
+                  </a>
+                ) : (
+                  <span>Seller unknown</span>
+                )}
                 <span>{reviews.length} review{reviews.length === 1 ? "" : "s"}</span>
               </div>
 
