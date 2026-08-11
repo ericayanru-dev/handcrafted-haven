@@ -233,6 +233,16 @@
   color: var(--text-secondary);
 }
 
+.sellerLink {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sellerLink:hover {
+  text-decoration: underline;
+}
+
 .form {
   display: grid;
   gap: var(--space-4);

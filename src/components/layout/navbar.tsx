@@ -15,9 +15,9 @@ const navigationItems = [
   { href: "/#next", label: "Next Steps" },
 ];
 
-function isActivePath(pathname: string, href: string) {
+function isActivePath(pathname: string, href: string, hash: string) {
   if (href.startsWith("/#")) {
-    return pathname === "/";
+    return pathname === "/" && hash === href.slice(1);
   }
 
   if (href === "/") {
@@ -43,10 +43,21 @@ export function Navbar() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [authActionError, setAuthActionError] = useState("");
+  const [currentHash, setCurrentHash] = useState("");
   const pathname = usePathname();
   const router = useRouter();
   const isLoginPage = pathname === "/login";
   const isRegisterPage = pathname === "/register";
+  const isCartPage = pathname === "/cart";
+
+  useEffect(() => {
+    function syncHash() {
+      setCurrentHash(window.location.hash);
+    }
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, [pathname]);
 
   function closeMenuOnSmallScreens() {
     if (typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches) {
@@ -127,7 +138,7 @@ export function Navbar() {
           {navigationItems.map((item) => (
             <a
               key={item.href}
-              className={isActivePath(pathname, item.href) ? styles.navLinkActive : styles.navLink}
+              className={isActivePath(pathname, item.href, currentHash) ? styles.navLinkActive : styles.navLink}
               href={item.href}
             >
               {item.label}
@@ -136,7 +147,7 @@ export function Navbar() {
         </nav>
 
         <div className={styles.navActions}>
-          <Button href="/cart" size="sm" variant="secondary">
+          <Button href="/cart" size="sm" variant={isCartPage ? "primary" : "secondary"}>
             Cart
           </Button>
           {!isCheckingAuth && sessionUser ? (
@@ -179,7 +190,7 @@ export function Navbar() {
           {navigationItems.map((item) => (
             <a
               key={item.href}
-              className={isActivePath(pathname, item.href) ? styles.mobileNavLinkActive : styles.mobileNavLink}
+              className={isActivePath(pathname, item.href, currentHash) ? styles.mobileNavLinkActive : styles.mobileNavLink}
               href={item.href}
               onClick={closeMenuOnSmallScreens}
             >
@@ -187,7 +198,7 @@ export function Navbar() {
             </a>
           ))}
           <div className={styles.mobileNavFooter}>
-            <Button href="/cart" fullWidth onClick={closeMenuOnSmallScreens} variant="secondary">
+            <Button href="/cart" fullWidth onClick={closeMenuOnSmallScreens} variant={isCartPage ? "primary" : "secondary"}>
               Cart
             </Button>
             {!isCheckingAuth && sessionUser ? (

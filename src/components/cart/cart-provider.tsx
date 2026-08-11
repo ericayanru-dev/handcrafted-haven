@@ -42,6 +42,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       setMessage("");
       try {
+        // Skip the cart API for unauthenticated users to avoid 401 console errors
+        const authResponse = await fetch("/api/auth/me", { method: "GET" });
+        if (!authResponse.ok) {
+          if (isMounted) {
+            setItems([]);
+            setSyncMode("api");
+          }
+          return;
+        }
+
         const snapshot = await loadCart();
         if (!isMounted) {
           return;
