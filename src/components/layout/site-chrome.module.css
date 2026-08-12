@@ -168,6 +168,11 @@
   border-top: 1px solid var(--border);
 }
 
+.mobileNotificationRow {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .navError {
   border: 1px solid rgba(185, 28, 28, 0.22);
   border-radius: var(--radius-md);

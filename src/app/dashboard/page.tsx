@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { loadOrderHistory, type OrderRecord } from "@/components/orders";
 import {
   DashboardNavigation,
+  MetricBarChart,
   SalesSummaryCards,
   SellerOverview,
 } from "@/components/seller-dashboard";
@@ -184,6 +185,34 @@ export default function SellerDashboardPage() {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3);
 
+    const productTitles = new Map(sellerPayload.products.map((product) => [product.id, product.title]));
+    const productPerformanceMap = new Map<string, { units: number; revenue: number; title: string }>();
+
+    for (const order of matchingOrders) {
+      for (const item of order.items) {
+        const key = item.productId;
+        const current = productPerformanceMap.get(key) ?? {
+          units: 0,
+          revenue: 0,
+          title: productTitles.get(key) ?? item.title,
+        };
+
+        current.units += item.quantity;
+        current.revenue += item.price * item.quantity;
+        productPerformanceMap.set(key, current);
+      }
+    }
+
+    const topProductsByUnits = Array.from(productPerformanceMap.entries())
+      .map(([productId, metrics]) => ({
+        productId,
+        title: metrics.title,
+        units: metrics.units,
+        revenue: metrics.revenue,
+      }))
+      .sort((a, b) => b.units - a.units)
+      .slice(0, 5);
+
     const averageOrderValue = matchingOrders.length > 0 ? revenue / matchingOrders.length : 0;
 
     return {
@@ -208,6 +237,7 @@ export default function SellerDashboardPage() {
       product: {
         catalogValue,
         topCategories,
+        topProductsByUnits,
       },
     };
   }, [orders, sellerPayload]);
@@ -361,6 +391,34 @@ export default function SellerDashboardPage() {
                   View orders
                 </Button>
               </div>
+            </Card>
+          </div>
+
+          <div className={styles.twoColumn}>
+            <Card>
+              <MetricBarChart
+                items={derived.product.topProductsByUnits.map((item) => ({
+                  id: item.productId,
+                  label: item.title,
+                  value: item.units,
+                  description: `${item.units} sold (${formatCurrency(item.revenue)})`,
+                }))}
+                subtitle="Product statistics"
+                title="Top products by units sold"
+              />
+            </Card>
+
+            <Card>
+              <MetricBarChart
+                items={derived.product.topCategories.map(([name, count]) => ({
+                  id: name,
+                  label: name,
+                  value: count,
+                  description: `${count} listings`,
+                }))}
+                subtitle="Catalog analytics"
+                title="Category distribution"
+              />
             </Card>
           </div>
         </section>

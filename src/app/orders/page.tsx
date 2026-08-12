@@ -13,10 +13,18 @@ import { Loading } from "@/components/state/loading";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
 
+type MeResponse = {
+  success?: boolean;
+  user?: {
+    id: string;
+  } | null;
+};
+
 export default function OrderHistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [error, setError] = useState("");
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -24,8 +32,24 @@ export default function OrderHistoryPage() {
     async function load() {
       setIsLoading(true);
       setError("");
+      setIsSignedIn(false);
 
       try {
+        const authResponse = await fetch("/api/auth/me", { method: "GET" });
+        const authResult = (await authResponse.json()) as MeResponse;
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (!authResponse.ok || !authResult.success || !authResult.user) {
+          setOrders([]);
+          setIsSignedIn(false);
+          return;
+        }
+
+        setIsSignedIn(true);
+
         const result = await loadOrderHistory();
         if (!isMounted) {
           return;
@@ -69,7 +93,19 @@ export default function OrderHistoryPage() {
 
           {error ? <p className={styles.error}>{error}</p> : null}
 
-          {!error && orders.length === 0 ? (
+          {!error && !isSignedIn ? (
+            <div className={styles.status}>
+              <p>Please sign in to view your order history.</p>
+              <div className={styles.actions}>
+                <Button href="/login">Log in</Button>
+                <Button href="/marketplace" variant="secondary">
+                  Browse marketplace
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          {!error && isSignedIn && orders.length === 0 ? (
             <div className={styles.status}>
               <p>You have not placed any orders yet.</p>
               <div className={styles.actions}>
@@ -78,7 +114,7 @@ export default function OrderHistoryPage() {
             </div>
           ) : null}
 
-          {!error && orders.length > 0 ? (
+          {!error && isSignedIn && orders.length > 0 ? (
             <div className={styles.orderList}>
               {orders.map((order) => (
                 <Card className={styles.orderCard} key={order.id}>
