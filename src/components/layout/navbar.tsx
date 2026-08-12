@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { NotificationCenter } from "@/components/notifications";
 import { Button, Container } from "@/components/ui";
 import styles from "./site-chrome.module.css";
 
@@ -137,6 +138,7 @@ export function Navbar() {
         <nav className={styles.navDesktop} aria-label="Primary">
           {navigationItems.map((item) => (
             <a
+              aria-current={isActivePath(pathname, item.href, currentHash) ? "page" : undefined}
               key={item.href}
               className={isActivePath(pathname, item.href, currentHash) ? styles.navLinkActive : styles.navLink}
               href={item.href}
@@ -152,9 +154,7 @@ export function Navbar() {
           </Button>
           {!isCheckingAuth && sessionUser ? (
             <>
-              <Button href="/dashboard" size="sm" variant="secondary">
-                Dashboard
-              </Button>
+              <NotificationCenter isAuthenticated />
               <Button onClick={handleLogout} size="sm" variant="secondary">
                 Log out
               </Button>
@@ -189,6 +189,7 @@ export function Navbar() {
         <nav className={styles.mobileNav} aria-label="Mobile primary navigation">
           {navigationItems.map((item) => (
             <a
+              aria-current={isActivePath(pathname, item.href, currentHash) ? "page" : undefined}
               key={item.href}
               className={isActivePath(pathname, item.href, currentHash) ? styles.mobileNavLinkActive : styles.mobileNavLink}
               href={item.href}
@@ -203,9 +204,9 @@ export function Navbar() {
             </Button>
             {!isCheckingAuth && sessionUser ? (
               <>
-                <Button href="/dashboard" fullWidth onClick={closeMenuOnSmallScreens} variant="secondary">
-                  Dashboard
-                </Button>
+                <div className={styles.mobileNotificationRow}>
+                  <NotificationCenter isAuthenticated />
+                </div>
                 <Button fullWidth onClick={handleLogout} variant="secondary">
                   Log out
                 </Button>

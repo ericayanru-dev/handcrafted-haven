@@ -124,18 +124,21 @@ export default function ProductListingPage() {
 
           <div className={styles.toolbar}>
             <input
+              aria-label="Search products"
               className={styles.field}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search title or description"
               value={search}
             />
             <input
+              aria-label="Filter by category"
               className={styles.field}
               onChange={(event) => setCategory(event.target.value)}
               placeholder="Category"
               value={category}
             />
             <select
+              aria-label="Sort products"
               className={styles.select}
               onChange={(event) => setSortBy(event.target.value)}
               value={sortBy}
