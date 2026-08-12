@@ -1,0 +1,853 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Handcrafted Haven API",
+    "description": "REST API documentation for the Handcrafted Haven marketplace.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    },
+    {
+      "url": "https://handcrafted-haven-phi.vercel.app",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and account management"
+    },
+    {
+      "name": "Products",
+      "description": "Product management and catalog operations"
+    },
+    {
+      "name": "Cart",
+      "description": "Shopping cart operations"
+    },
+    {
+      "name": "Orders",
+      "description": "Order creation and management"
+    },
+    {
+      "name": "Reviews",
+      "description": "Product review operations"
+    },
+    {
+      "name": "Sellers",
+      "description": "Seller profile management"
+    },
+    {
+      "name": "Upload",
+      "description": "File upload operations"
+    }
+  ],
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Create a new user account",
+        "description": "Register a new account and send a verification email.",
+        "operationId": "signupUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["firstName", "lastName", "email", "password"],
+                "properties": {
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created successfully." },
+          "400": { "description": "Invalid request payload." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Log in a user",
+        "description": "Authenticate a user and issue access and refresh tokens as secure cookies.",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User authenticated successfully." },
+          "401": { "description": "Invalid credentials." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Log out the current user",
+        "description": "Invalidate the user session and clear authentication cookies.",
+        "operationId": "logoutUser",
+        "responses": {
+          "200": { "description": "User logged out successfully." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get the current authenticated user",
+        "description": "Returns the current authenticated user from the access token cookie.",
+        "operationId": "getCurrentUser",
+        "security": [{ "accessToken": [] }],
+        "responses": {
+          "200": { "description": "Current user details returned." },
+          "401": { "description": "User is not authenticated." }
+        }
+      }
+    },
+    "/api/auth/verify-email": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify a user email",
+        "description": "Verify the email account using the token sent during registration.",
+        "operationId": "verifyEmail",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token"],
+                "properties": {
+                  "token": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Email verified successfully." },
+          "400": { "description": "Verification token is missing or invalid." }
+        }
+      }
+    },
+    "/api/product/get-products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get all products",
+        "description": "Returns the complete product list without requiring any filter parameters.",
+        "operationId": "getAllProducts",
+        "responses": {
+          "200": {
+            "description": "All products returned.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "cm9k5t7ys0000q5m6abc1234",
+                      "sellerId": "cm9k5t7ys0000q5m6seller123",
+                      "title": "Handmade Ceramic Mug",
+                      "description": "Handcrafted ceramic mug with a natural glaze and comfortable handle.",
+                      "price": 39.99,
+                      "stock": 12,
+                      "category": "Home Decor",
+                      "imageUrl": "https://example.com/products/ceramic-mug.jpg",
+                      "rating": 4.8,
+                      "createdAt": "2026-08-12T10:00:00.000Z",
+                      "updatedAt": "2026-08-12T10:00:00.000Z",
+                      "seller": {
+                        "id": "cm9k5t7ys0000q5m6seller123",
+                        "storeName": "Clay & Co.",
+                        "user": {
+                          "id": "cm9k5t7ys0000q5m6user123",
+                          "name": "Maria Lopez"
+                        }
+                      },
+                      "reviews": [
+                        { "rating": 5 },
+                        { "rating": 4 }
+                      ]
+                    }
+                  ],
+                  "status": 200
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/api/product/get-product/{id}": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get a product by ID",
+        "description": "Returns the full details for a single product.",
+        "operationId": "getProductById",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "cm9k5t7ys0000q5m6abc1234" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "cm9k5t7ys0000q5m6abc1234",
+                    "sellerId": "cm9k5t7ys0000q5m6seller123",
+                    "title": "Handmade Ceramic Mug",
+                    "description": "Handcrafted ceramic mug with a natural glaze and comfortable handle.",
+                    "price": 39.99,
+                    "stock": 12,
+                    "category": "Home Decor",
+                    "imageUrl": "https://example.com/products/ceramic-mug.jpg",
+                    "rating": 4.8,
+                    "createdAt": "2026-08-12T10:00:00.000Z",
+                    "updatedAt": "2026-08-12T10:00:00.000Z",
+                    "seller": {
+                      "id": "cm9k5t7ys0000q5m6seller123",
+                      "storeName": "Clay & Co.",
+                      "bio": "Small-batch ceramics made by hand in our studio.",
+                      "rating": 4.9,
+                      "userId": "cm9k5t7ys0000q5m6user123",
+                      "user": {
+                        "id": "cm9k5t7ys0000q5m6user123",
+                        "name": "Maria Lopez"
+                      }
+                    },
+                    "reviews": [
+                      { "id": "cm9k5t7ys0000q5m6review1", "rating": 5, "comment": "Beautiful and well made.", "user": { "id": "cm9k5t7ys0000q5m6user456", "name": "Alex" } },
+                      { "id": "cm9k5t7ys0000q5m6review2", "rating": 4, "comment": "Great quality and fast shipping.", "user": { "id": "cm9k5t7ys0000q5m6user789", "name": "Sam" } }
+                    ]
+                  },
+                  "status": 200
+                }
+              }
+            }
+          },
+          "404": { "description": "Product not found." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    },
+    "/api/product/create": {
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create a product",
+        "description": "Create a new product for the authenticated seller. Requires an Idempotency-Key header.",
+        "operationId": "createProduct",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": true, "schema": { "type": "string", "minLength": 8, "maxLength": 128 }, "example": "prod-create-2026-08-12-001" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "description", "price", "category"],
+                "properties": {
+                  "title": { "type": "string", "example": "Handmade Ceramic Mug" },
+                  "description": { "type": "string", "example": "Handcrafted ceramic mug with a natural glaze and comfortable handle." },
+                  "price": { "type": "number", "example": 39.99 },
+                  "stock": { "type": "integer", "example": 12 },
+                  "category": { "type": "string", "example": "Home Decor" },
+                  "imageUrl": { "type": "string", "format": "uri", "example": "https://example.com/products/ceramic-mug.jpg" }
+                }
+              },
+              "example": {
+                "title": "Handmade Ceramic Mug",
+                "description": "Handcrafted ceramic mug with a natural glaze and comfortable handle.",
+                "price": 39.99,
+                "stock": 12,
+                "category": "Home Decor",
+                "imageUrl": "https://example.com/products/ceramic-mug.jpg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created successfully.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "cm9k5t7ys0000q5m6abc1234",
+                    "sellerId": "cm9k5t7ys0000q5m6seller123",
+                    "title": "Handmade Ceramic Mug",
+                    "description": "Handcrafted ceramic mug with a natural glaze and comfortable handle.",
+                    "price": 39.99,
+                    "stock": 12,
+                    "category": "Home Decor",
+                    "imageUrl": "https://example.com/products/ceramic-mug.jpg",
+                    "seller": {
+                      "id": "cm9k5t7ys0000q5m6seller123",
+                      "storeName": "Clay & Co."
+                    }
+                  },
+                  "message": "Product created successfully",
+                  "status": 201
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing Idempotency-Key or invalid request payload." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/product/edit/{id}": {
+      "patch": {
+        "tags": ["Products"],
+        "summary": "Update a product",
+        "description": "Update an existing product by ID.",
+        "operationId": "updateProduct",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "cm9k5t7ys0000q5m6abc1234" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "example": "Updated Handmade Ceramic Mug" },
+                  "description": { "type": "string", "example": "Updated description with a matte finish and new colors." },
+                  "price": { "type": "number", "example": 44.99 },
+                  "stock": { "type": "integer", "example": 9 },
+                  "category": { "type": "string", "example": "Home Decor" },
+                  "imageUrl": { "type": "string", "format": "uri", "example": "https://example.com/products/updated-ceramic-mug.jpg" }
+                }
+              },
+              "example": {
+                "title": "Updated Handmade Ceramic Mug",
+                "description": "Updated description with a matte finish and new colors.",
+                "price": 44.99,
+                "stock": 9,
+                "category": "Home Decor",
+                "imageUrl": "https://example.com/products/updated-ceramic-mug.jpg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "cm9k5t7ys0000q5m6abc1234",
+                    "sellerId": "cm9k5t7ys0000q5m6seller123",
+                    "title": "Updated Handmade Ceramic Mug",
+                    "description": "Updated description with a matte finish and new colors.",
+                    "price": 44.99,
+                    "stock": 9,
+                    "category": "Home Decor",
+                    "imageUrl": "https://example.com/products/updated-ceramic-mug.jpg",
+                    "seller": {
+                      "id": "cm9k5t7ys0000q5m6seller123",
+                      "storeName": "Clay & Co."
+                    }
+                  },
+                  "message": "Product updated successfully",
+                  "status": 200
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid payload." },
+          "404": { "description": "Product not found." }
+        }
+      }
+    },
+    "/api/product/delete/{id}": {
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Delete a product",
+        "description": "Delete a product by ID.",
+        "operationId": "deleteProduct",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "cm9k5t7ys0000q5m6abc1234" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product deleted successfully.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Product deleted successfully",
+                  "status": 200
+                }
+              }
+            }
+          },
+          "404": { "description": "Product not found." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/cart/get": {
+      "get": {
+        "tags": ["Cart"],
+        "summary": "Get the current cart",
+        "description": "Returns the current authenticated user's cart.",
+        "operationId": "getCart",
+        "security": [{ "accessToken": [] }],
+        "responses": {
+          "200": { "description": "Cart returned successfully." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/cart/add": {
+      "post": {
+        "tags": ["Cart"],
+        "summary": "Add an item to the cart",
+        "description": "Add a product to the authenticated user's cart. Requires an Idempotency-Key header.",
+        "operationId": "addToCart",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": true, "schema": { "type": "string", "minLength": 8, "maxLength": 128 } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productId", "quantity"],
+                "properties": {
+                  "productId": { "type": "string" },
+                  "quantity": { "type": "integer", "minimum": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Item added to cart." },
+          "400": { "description": "Invalid payload or missing Idempotency-Key." },
+          "409": { "description": "Idempotency conflict or request still processing." }
+        }
+      }
+    },
+    "/api/cart/update": {
+      "patch": {
+        "tags": ["Cart"],
+        "summary": "Update a cart item quantity",
+        "description": "Update the quantity of a cart line item.",
+        "operationId": "updateCartItem",
+        "security": [{ "accessToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productId", "quantity"],
+                "properties": {
+                  "productId": { "type": "string" },
+                  "quantity": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Cart item updated successfully." },
+          "400": { "description": "Invalid cart update request." }
+        }
+      }
+    },
+    "/api/cart/remove": {
+      "delete": {
+        "tags": ["Cart"],
+        "summary": "Remove a cart item",
+        "description": "Remove a single item from the current cart.",
+        "operationId": "removeCartItem",
+        "security": [{ "accessToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productId"],
+                "properties": {
+                  "productId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Cart item removed." },
+          "400": { "description": "Invalid removal request." }
+        }
+      }
+    },
+    "/api/cart/clear": {
+      "delete": {
+        "tags": ["Cart"],
+        "summary": "Clear the cart",
+        "description": "Remove all items from the current cart.",
+        "operationId": "clearCart",
+        "security": [{ "accessToken": [] }],
+        "responses": {
+          "200": { "description": "Cart cleared successfully." }
+        }
+      }
+    },
+    "/api/orders/checkout": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Create an order from the cart",
+        "description": "Checkout the current cart and create an order. Requires an Idempotency-Key header.",
+        "operationId": "checkoutCart",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": true, "schema": { "type": "string", "minLength": 8, "maxLength": 128 } }
+        ],
+        "responses": {
+          "200": { "description": "Order created successfully." },
+          "400": { "description": "Invalid checkout request." },
+          "409": { "description": "Checkout is still processing or the idempotency key conflicted." }
+        }
+      }
+    },
+    "/api/orders/history": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get order history",
+        "description": "Returns the current user's order history.",
+        "operationId": "getOrderHistory",
+        "security": [{ "accessToken": [] }],
+        "responses": {
+          "200": { "description": "Order history returned." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/orders/get-order/{id}": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get an order by ID",
+        "description": "Returns a single order for the authenticated user.",
+        "operationId": "getOrderById",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Order returned successfully." },
+          "404": { "description": "Order not found." }
+        }
+      }
+    },
+    "/api/orders/update-status/{id}": {
+      "patch": {
+        "tags": ["Orders"],
+        "summary": "Update an order status",
+        "description": "Update the status of an order for payment or admin workflows.",
+        "operationId": "updateOrderStatus",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Order status updated successfully." },
+          "400": { "description": "Invalid status payload." }
+        }
+      }
+    },
+    "/api/reviews/get-review/{productId}": {
+      "get": {
+        "tags": ["Reviews"],
+        "summary": "Get reviews for a product",
+        "description": "Retrieve all reviews submitted for a specific product.",
+        "operationId": "getProductReviews",
+        "parameters": [
+          { "name": "productId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product reviews returned." },
+          "404": { "description": "Product not found or no reviews available." }
+        }
+      }
+    },
+    "/api/reviews/create": {
+      "post": {
+        "tags": ["Reviews"],
+        "summary": "Create a product review",
+        "description": "Create a review for a product.",
+        "operationId": "createReview",
+        "security": [{ "accessToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productId", "rating", "comment"],
+                "properties": {
+                  "productId": { "type": "string" },
+                  "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+                  "comment": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Review created successfully." },
+          "400": { "description": "Invalid review payload." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/reviews/update/{id}": {
+      "patch": {
+        "tags": ["Reviews"],
+        "summary": "Update a review",
+        "description": "Edit an existing review by ID.",
+        "operationId": "updateReview",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+                  "comment": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Review updated successfully." },
+          "400": { "description": "Invalid update payload." }
+        }
+      }
+    },
+    "/api/reviews/delete/{id}": {
+      "delete": {
+        "tags": ["Reviews"],
+        "summary": "Delete a review",
+        "description": "Delete a product review by ID.",
+        "operationId": "deleteReview",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Review deleted successfully." },
+          "404": { "description": "Review not found." }
+        }
+      }
+    },
+    "/api/seller/get-seller": {
+      "get": {
+        "tags": ["Sellers"],
+        "summary": "Get the current seller profile",
+        "description": "Returns the authenticated user's seller profile.",
+        "operationId": "getCurrentSellerProfile",
+        "security": [{ "accessToken": [] }],
+        "responses": {
+          "200": { "description": "Seller profile returned." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/seller/get-by-id/{id}": {
+      "get": {
+        "tags": ["Sellers"],
+        "summary": "Get a seller profile by ID",
+        "description": "Returns a seller profile by seller ID.",
+        "operationId": "getSellerById",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Seller profile returned." },
+          "404": { "description": "Seller profile not found." }
+        }
+      }
+    },
+    "/api/seller/get-sellers": {
+      "get": {
+        "tags": ["Sellers"],
+        "summary": "List seller profiles",
+        "description": "Returns the available seller profiles.",
+        "operationId": "getSellers",
+        "responses": {
+          "200": { "description": "Seller profiles returned." }
+        }
+      }
+    },
+    "/api/seller/create": {
+      "post": {
+        "tags": ["Sellers"],
+        "summary": "Create a seller profile",
+        "description": "Create a seller profile for the authenticated user.",
+        "operationId": "createSellerProfile",
+        "security": [{ "accessToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shopName": { "type": "string" },
+                  "bio": { "type": "string" },
+                  "location": { "type": "string" },
+                  "website": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Seller profile created successfully." },
+          "400": { "description": "Invalid seller profile payload." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/seller/edit": {
+      "patch": {
+        "tags": ["Sellers"],
+        "summary": "Update the current seller profile",
+        "description": "Update the authenticated user's seller profile.",
+        "operationId": "editSellerProfile",
+        "security": [{ "accessToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shopName": { "type": "string" },
+                  "bio": { "type": "string" },
+                  "location": { "type": "string" },
+                  "website": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Seller profile updated successfully." },
+          "400": { "description": "Invalid seller profile payload." }
+        }
+      }
+    },
+    "/api/seller/delete": {
+      "delete": {
+        "tags": ["Sellers"],
+        "summary": "Delete the current seller profile",
+        "description": "Delete the authenticated user's seller profile.",
+        "operationId": "deleteSellerProfile",
+        "security": [{ "accessToken": [] }],
+        "responses": {
+          "200": { "description": "Seller profile deleted successfully." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    },
+    "/api/upload": {
+      "post": {
+        "tags": ["Upload"],
+        "summary": "Upload a product image",
+        "description": "Upload a JPG, PNG, or WebP image and return the public URL.",
+        "operationId": "uploadProductImage",
+        "security": [{ "accessToken": [] }],
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": true, "schema": { "type": "string", "minLength": 8, "maxLength": 100 } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Image uploaded successfully." },
+          "400": { "description": "No file provided or invalid format/size." },
+          "401": { "description": "Unauthorized." }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  }
+}
