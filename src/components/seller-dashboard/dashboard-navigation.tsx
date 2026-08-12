@@ -32,6 +32,7 @@ export function DashboardNavigation() {
     <nav aria-label="Seller dashboard navigation" className={styles.dashboardNav}>
       {links.map((link) => (
         <a
+          aria-current={isActive(pathname, link.href) ? "page" : undefined}
           className={isActive(pathname, link.href) ? styles.dashboardNavLinkActive : styles.dashboardNavLink}
           href={link.href}
           key={link.href}

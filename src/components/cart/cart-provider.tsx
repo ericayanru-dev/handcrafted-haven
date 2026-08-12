@@ -25,6 +25,13 @@ type CartContextValue = {
   clearCart: () => Promise<void>;
 };
 
+type MeResponse = {
+  success?: boolean;
+  user?: {
+    id: string;
+  } | null;
+};
+
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
@@ -44,7 +51,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         // Skip the cart API for unauthenticated users to avoid 401 console errors
         const authResponse = await fetch("/api/auth/me", { method: "GET" });
-        if (!authResponse.ok) {
+        const authPayload = (await authResponse.json()) as MeResponse;
+
+        if (!authResponse.ok || !authPayload.success || !authPayload.user) {
           if (isMounted) {
             setItems([]);
             setSyncMode("api");
