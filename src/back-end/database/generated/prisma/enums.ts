@@ -19,3 +19,21 @@ export const OrderStatus = {
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const PaymentStatus = {
+  INITIATED: 'INITIATED',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const PaymentType = {
+  CHARGE: 'CHARGE',
+  REFUND: 'REFUND',
+  CAPTURE: 'CAPTURE'
+} as const
+
+export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType]

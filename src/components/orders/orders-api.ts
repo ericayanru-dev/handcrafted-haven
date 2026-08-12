@@ -40,7 +40,12 @@ function normalizeOrder(order: OrderRecord): OrderRecord {
 function toOrdersErrorMessage(status: number, payload: OrdersResponse) {
   const rawMessage = (payload.message ?? payload.error ?? "").trim().toLowerCase();
 
-  if (status === 401 || status === 403 || rawMessage.includes("unauthorized") || rawMessage.includes("forbidden")) {
+  if (
+    status === 401 ||
+    status === 403 ||
+    rawMessage.includes("unauthorized") ||
+    rawMessage.includes("forbidden")
+  ) {
     return "Please sign in to view and manage your orders.";
   }
 
@@ -164,7 +169,9 @@ function extractOrders(payload: OrdersResponse): ApiOrderRecord[] {
   return [];
 }
 
-export async function createOrder(input: CreateOrderInput): Promise<{ order: OrderRecord; mode: "api"; message?: string }> {
+export async function createOrder(
+  input: CreateOrderInput
+): Promise<{ order: OrderRecord; mode: "api"; message?: string }> {
   const payload = await fetchOrdersEndpoint("/api/orders/checkout", {
     method: "POST",
   });
@@ -193,7 +200,9 @@ export async function loadOrderHistory(): Promise<{ orders: OrderRecord[]; mode:
   };
 }
 
-export async function loadOrderById(orderId: string): Promise<{ order: OrderRecord | null; mode: "api" }> {
+export async function loadOrderById(
+  orderId: string
+): Promise<{ order: OrderRecord | null; mode: "api" }> {
   const payload = await fetchOrdersEndpoint(`/api/orders/get-order/${orderId}`, { method: "GET" });
   const order = extractOrder(payload);
   return {
