@@ -154,7 +154,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <h2 className={styles.formTitle}>{isSignup ? "Register" : "Login"}</h2>
         <p className={styles.formText}>
           {isSignup
-            ? "Create your account with the same validation rules the server expects."
+            ? "Create your account to start shopping, selling, and managing orders."
             : "Use your email and password to sign in and continue to the marketplace."}
         </p>
       </div>

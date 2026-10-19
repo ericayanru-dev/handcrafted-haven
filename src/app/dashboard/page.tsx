@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { loadOrderHistory, type OrderRecord } from "@/components/orders";
 import {
   DashboardNavigation,
+  MetricBarChart,
   SalesSummaryCards,
   SellerOverview,
 } from "@/components/seller-dashboard";
@@ -78,10 +79,6 @@ export default function SellerDashboardPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [sellerPayload, setSellerPayload] = useState<SellerApiResponse["data"]>(undefined);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-<<<<<<< HEAD
-=======
-  const [ordersMode, setOrdersMode] = useState<"api" | "local">("local");
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 
   useEffect(() => {
     let isMounted = true;
@@ -119,10 +116,6 @@ export default function SellerDashboardPage() {
         }
 
         setOrders(ordersResult.orders);
-<<<<<<< HEAD
-=======
-        setOrdersMode(ordersResult.mode);
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       } catch {
         if (isMounted) {
           setErrorMessage("Could not load seller dashboard right now.");
@@ -192,6 +185,34 @@ export default function SellerDashboardPage() {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3);
 
+    const productTitles = new Map(sellerPayload.products.map((product) => [product.id, product.title]));
+    const productPerformanceMap = new Map<string, { units: number; revenue: number; title: string }>();
+
+    for (const order of matchingOrders) {
+      for (const item of order.items) {
+        const key = item.productId;
+        const current = productPerformanceMap.get(key) ?? {
+          units: 0,
+          revenue: 0,
+          title: productTitles.get(key) ?? item.title,
+        };
+
+        current.units += item.quantity;
+        current.revenue += item.price * item.quantity;
+        productPerformanceMap.set(key, current);
+      }
+    }
+
+    const topProductsByUnits = Array.from(productPerformanceMap.entries())
+      .map(([productId, metrics]) => ({
+        productId,
+        title: metrics.title,
+        units: metrics.units,
+        revenue: metrics.revenue,
+      }))
+      .sort((a, b) => b.units - a.units)
+      .slice(0, 5);
+
     const averageOrderValue = matchingOrders.length > 0 ? revenue / matchingOrders.length : 0;
 
     return {
@@ -216,6 +237,7 @@ export default function SellerDashboardPage() {
       product: {
         catalogValue,
         topCategories,
+        topProductsByUnits,
       },
     };
   }, [orders, sellerPayload]);
@@ -258,11 +280,7 @@ export default function SellerDashboardPage() {
     {
       label: "Revenue",
       value: formatCurrency(derived.sales.revenue),
-<<<<<<< HEAD
       note: "Updated from your latest sales activity.",
-=======
-      note: ordersMode === "local" ? "Local estimate until dashboard API is connected." : "Synced from API.",
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     },
     {
       label: "Orders",
@@ -272,20 +290,12 @@ export default function SellerDashboardPage() {
     {
       label: "Units sold",
       value: String(derived.sales.soldUnits),
-<<<<<<< HEAD
       note: "Total items sold across orders that include your products.",
-=======
-      note: "Combined quantity from orders linked to your listings.",
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     },
     {
       label: "Average order",
       value: formatCurrency(derived.sales.averageOrderValue),
-<<<<<<< HEAD
       note: "Average order value when your products are included.",
-=======
-      note: "Average value per order containing your products.",
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     },
   ];
 
@@ -305,15 +315,6 @@ export default function SellerDashboardPage() {
 
           <DashboardNavigation />
 
-<<<<<<< HEAD
-=======
-          {ordersMode === "local" ? (
-            <p className={styles.info}>
-              Sales and order stats are in local preview mode while backend dashboard endpoints are being implemented.
-            </p>
-          ) : null}
-
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
           <SellerOverview {...derived.seller} />
 
           <div className={styles.stack}>
@@ -390,6 +391,34 @@ export default function SellerDashboardPage() {
                   View orders
                 </Button>
               </div>
+            </Card>
+          </div>
+
+          <div className={styles.twoColumn}>
+            <Card>
+              <MetricBarChart
+                items={derived.product.topProductsByUnits.map((item) => ({
+                  id: item.productId,
+                  label: item.title,
+                  value: item.units,
+                  description: `${item.units} sold (${formatCurrency(item.revenue)})`,
+                }))}
+                subtitle="Product statistics"
+                title="Top products by units sold"
+              />
+            </Card>
+
+            <Card>
+              <MetricBarChart
+                items={derived.product.topCategories.map(([name, count]) => ({
+                  id: name,
+                  label: name,
+                  value: count,
+                  description: `${count} listings`,
+                }))}
+                subtitle="Catalog analytics"
+                title="Category distribution"
+              />
             </Card>
           </div>
         </section>

@@ -129,12 +129,35 @@ export class ProductModel {
   }
 
   /**
+   * Get products by Idempotency Key
+   */
+  async findByIdempotencyKey(sellerId: string, idempotencyKey: string) {
+    return prisma.product.findUnique({
+      where: {
+        sellerId_idempotencyKey: {
+          sellerId,
+          idempotencyKey,
+        },
+      },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            storeName: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
    * Create product
    */
-  async create(sellerId: string, data: Product) {
+  async create(sellerId: string, data: Product, idempotencyKey: string) {
     return prisma.product.create({
       data: {
         sellerId,
+        idempotencyKey,
         title: data.title,
         description: data.description,
         price: data.price,

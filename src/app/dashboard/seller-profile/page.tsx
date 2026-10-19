@@ -192,11 +192,11 @@ export default function SellerProfilePage() {
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
-              <p className={styles.productCategory}>Seller profile page</p>
+                <p className={styles.productCategory}>Seller profile</p>
               <h2 className={styles.sectionTitle}>Your seller profile</h2>
             </div>
             <p className={styles.sectionText}>
-              This view is loaded from your account profile and product listings.
+                Keep your store details up to date so shoppers can learn about your brand.
             </p>
           </div>
 
@@ -209,7 +209,7 @@ export default function SellerProfilePage() {
           <div className={styles.sectionHeader}>
             <div>
               <p className={styles.productCategory}>Seller products</p>
-              <h2 className={styles.sectionTitle}>Products listed by this seller</h2>
+              <h2 className={styles.sectionTitle}>Products in your store</h2>
             </div>
           </div>
 

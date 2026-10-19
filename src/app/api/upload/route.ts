@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
       return authResult.response;
     }
 
+    const { payload } = authResult;
+
     // 2. Get the file from FormData
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
@@ -51,17 +53,59 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. Generate a unique filename
-    const extension = file.name.split(".").pop() || "jpg";
-    const uniqueName = `products/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+    // 5. Idempotency key (required for stable unique filename)
+    const idempotencyKey = req.headers.get("Idempotency-Key");
+
+    if (!idempotencyKey) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Idempotency-Key header is required",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Basic format check
+    if (idempotencyKey.length < 8 || idempotencyKey.length > 100) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid Idempotency-Key",
+        },
+        { status: 400 }
+      );
+    }
+
+    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const uniqueName = `products/${payload.userId}/${idempotencyKey}.${extension}`;
 
     // 6. Upload to Vercel Blob
     const blob = await put(uniqueName, file, {
       access: "public",
-      addRandomSuffix: false, // we already made it unique
+      addRandomSuffix: false,
     });
 
-    // 7. Return the public URL
+    // 7. Validate Blob response before using it
+    if (
+      !blob ||
+      typeof blob.url !== "string" ||
+      typeof blob.pathname !== "string" ||
+      blob.url.trim() === "" ||
+      blob.pathname.trim() === ""
+    ) {
+      console.error("[POST /api/upload] Invalid Blob response:", blob);
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Image upload failed",
+        },
+        { status: 500 }
+      );
+    }
+
+    // 8. Return the public URL
     return NextResponse.json(
       {
         success: true,

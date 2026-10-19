@@ -13,6 +13,7 @@ import type {
   SellerProfilesQuerySchema,
 } from "@/back-end/types/seller-profile-types";
 import { formatZodError } from "@/back-end/lib/utils/helper"; // adjust path if needed
+import type { Prisma } from "../database/generated/prisma/client";
 
 export class SellerProfileService {
   /**
@@ -158,6 +159,14 @@ export class SellerProfileService {
       };
     } catch (error) {
       console.error("[SellerProfileService.create]", error);
+      const prismaError = error as Prisma.PrismaClientKnownRequestError;
+      if (prismaError.code === "P2002") {
+        return {
+          success: false,
+          message: "Seller profile already exists for this user",
+          status: 409,
+        };
+      }
       return {
         success: false,
         message: "Failed to create seller profile",
@@ -238,15 +247,6 @@ export class SellerProfileService {
           success: false,
           message: "Seller profile not found",
           status: 404,
-        };
-      }
-
-      // Authorization: only the owner can delete
-      if (profile.userId !== userId) {
-        return {
-          success: false,
-          message: "You are not authorized to delete this profile",
-          status: 403,
         };
       }
 

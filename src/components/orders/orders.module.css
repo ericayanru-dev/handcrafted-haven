@@ -132,6 +132,12 @@
   color: var(--text-secondary);
 }
 
+.metaRow dt,
+.metaRow dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .summaryRowTotal {
   margin-top: 0.45rem;
   padding-top: 0.65rem;
@@ -187,11 +193,22 @@
 
 .lineItem {
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
   gap: var(--space-3);
   color: var(--text-secondary);
   font-size: 0.94rem;
+  flex-wrap: wrap;
+}
+
+.lineItem span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  flex: 1 1 13rem;
+}
+
+.lineItem strong {
+  white-space: nowrap;
 }
 
 .status {
@@ -227,6 +244,20 @@
 @media (max-width: 640px) {
   .page {
     padding: var(--space-6) 0;
+  }
+
+  .orderTop {
+    flex-direction: column;
+  }
+
+  .lineItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .lineItem strong {
+    align-self: flex-end;
   }
 
   .actions {

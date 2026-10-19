@@ -1,7 +1,4 @@
-import { randomUUID } from "crypto";
 import { orderModel } from "@/back-end/models/order-model";
-import { cartModel } from "@/back-end/models/cart-model";
-import { productModel } from "@/back-end/models/product-model";
 import {
   orderIdParamSchema,
   updateOrderStatusSchema,
@@ -14,61 +11,19 @@ export class OrderService {
    */
   async checkout(userId: string) {
     try {
-      const cart = await cartModel.findByUserId(userId);
+      const result = await orderModel.checkoutFromCart(userId);
 
-      if (!cart || cart.items.length === 0) {
+      if (!result.success) {
         return {
           success: false,
-          message: "Your cart is empty",
+          message: result.message,
           status: 400,
         };
       }
 
-      // Validate stock for every item
-      for (const item of cart.items) {
-        const product = await productModel.findById(item.productId);
-
-        if (!product) {
-          return {
-            success: false,
-            message: `Product "${item.product.title}" no longer exists`,
-            status: 400,
-          };
-        }
-
-        if (product.stock < item.quantity) {
-          return {
-            success: false,
-            message: `Not enough stock for "${product.title}". Only ${product.stock} left.`,
-            status: 400,
-          };
-        }
-      }
-
-      const items = cart.items.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        price: Number(item.product.price),
-        title: item.product.title,
-      }));
-
-      const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-      const reference = `ORD-${randomUUID()}`;
-
-      const order = await orderModel.create({
-        userId,
-        total,
-        reference,
-        items,
-      });
-
-      // Clear cart after successful order creation
-      await cartModel.clearCart(cart.id);
-
       return {
         success: true,
-        data: order,
+        data: result.order,
         message: "Order created successfully",
         status: 201,
       };
@@ -152,9 +107,9 @@ export class OrderService {
   }
 
   /**
-   * Update order status (for payment webhook / admin later)
+   * Update order status (owner-restricted for now)
    */
-  async updateStatus(id: string, body: unknown) {
+  async updateStatus(id: string, userId: string, body: unknown) {
     try {
       const idValidation = orderIdParamSchema.safeParse({ id });
       if (!idValidation.success) {
@@ -175,6 +130,7 @@ export class OrderService {
       }
 
       const order = await orderModel.findById(idValidation.data.id);
+
       if (!order) {
         return {
           success: false,
@@ -183,9 +139,35 @@ export class OrderService {
         };
       }
 
+      if (order.userId !== userId) {
+        return {
+          success: false,
+          message: "You are not authorized to update this order",
+          status: 403,
+        };
+      }
+
+      // Customer can only cancel pending orders for now
+      const allowedForCustomer = ["CANCELLED"];
+      if (!allowedForCustomer.includes(bodyValidation.data.status)) {
+        return {
+          success: false,
+          message: "You are not allowed to set this status",
+          status: 403,
+        };
+      }
+
+      if (order.status !== "PENDING" && bodyValidation.data.status === "CANCELLED") {
+        return {
+          success: false,
+          message: "Only pending orders can be cancelled",
+          status: 400,
+        };
+      }
+
       const updated = await orderModel.updateStatus(
         idValidation.data.id,
-        bodyValidation.data.status
+        bodyValidation.data.status,
       );
 
       return {

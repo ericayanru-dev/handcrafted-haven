@@ -1,10 +1,6 @@
 "use client";
 
-<<<<<<< HEAD
 import { useEffect, useMemo, useRef, useState } from "react";
-=======
-import { useMemo, useState, useRef } from "react";
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Button, Card } from "@/components/ui";
@@ -30,7 +26,6 @@ const productSchema = z.object({
   imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
 
-<<<<<<< HEAD
 const editableFields = ["title", "description", "price", "stock", "category", "imageUrl"] as const;
 
 const editFieldSchemas = {
@@ -42,8 +37,6 @@ const editFieldSchemas = {
   imageUrl: productSchema.shape.imageUrl,
 };
 
-=======
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
 export type ProductFormValues = {
   title: string;
   description: string;
@@ -81,19 +74,15 @@ const defaultValues: ProductFormValues = {
 
 export function ProductForm({ mode, productId, initialValues }: ProductFormProps) {
   const router = useRouter();
-<<<<<<< HEAD
+  const uploadIdRef = useRef(0);
+  const idempotencyKeyRef = useRef<string | null>(null);
+
   const baseValues: ProductFormValues = {
     ...defaultValues,
     ...initialValues,
   };
-  const [values, setValues] = useState<ProductFormValues>({
-    ...baseValues,
-=======
-  const [values, setValues] = useState<ProductFormValues>({
-    ...defaultValues,
-    ...initialValues,
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
-  });
+
+  const [values, setValues] = useState<ProductFormValues>({ ...baseValues });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
@@ -101,11 +90,8 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   const [isUploading, setIsUploading] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string | null>(initialValues?.imageUrl ?? null);
 
-<<<<<<< HEAD
   useEffect(() => {
-    if (mode !== "edit") {
-      return;
-    }
+    if (mode !== "edit") return;
 
     const nextValues: ProductFormValues = {
       ...defaultValues,
@@ -116,8 +102,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
     setPreviewSrc(nextValues.imageUrl || null);
   }, [mode, initialValues]);
 
-=======
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   const heading = mode === "create" ? "Create product" : "Edit product";
 
   const endpoint = useMemo(() => {
@@ -125,6 +109,17 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   }, [mode, productId]);
 
   const cancelHref = "/dashboard/products";
+
+  function getIdempotencyKey() {
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = crypto.randomUUID();
+    }
+    return idempotencyKeyRef.current;
+  }
+
+  function resetIdempotencyKey() {
+    idempotencyKeyRef.current = null;
+  }
 
   function updateField(field: keyof ProductFormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -139,16 +134,14 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
   /**
    * Upload image to Vercel Blob via /api/upload
    */
-  const uploadIdRef = useRef(0);
-
   async function handleImageFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Increase the ID so older uploads become "stale"
-    const currentUploadId = ++uploadIdRef.current;
+    // Allow re-selecting the same file later
+    event.target.value = "";
 
-    // Local preview
+    const currentUploadId = ++uploadIdRef.current;
     const objectUrl = URL.createObjectURL(file);
     setPreviewSrc(objectUrl);
 
@@ -160,17 +153,21 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
       const formData = new FormData();
       formData.append("file", file);
 
+      // Separate key for upload (NOT the product create key)
+      const uploadIdempotencyKey = crypto.randomUUID();
+
       const res = await fetch("/api/upload", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Idempotency-Key": uploadIdempotencyKey,
+        },
+        body: formData, // do NOT set Content-Type
       });
 
       const result = await res.json();
 
-      // Ignore this response if the user already selected another file
-      if (currentUploadId !== uploadIdRef.current) {
-        return;
-      }
+      // Ignore stale upload if user selected another file
+      if (currentUploadId !== uploadIdRef.current) return;
 
       if (!res.ok || !result.success) {
         setFormError(result.message || "Image upload failed");
@@ -178,8 +175,10 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         return;
       }
 
-      updateField("imageUrl", result.data.url);
-      setPreviewSrc(result.data.url);
+      const uploadedUrl = result.data?.url as string;
+
+      updateField("imageUrl", uploadedUrl);
+      setPreviewSrc(uploadedUrl);
     } catch {
       if (currentUploadId !== uploadIdRef.current) return;
 
@@ -201,7 +200,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
       return;
     }
 
-<<<<<<< HEAD
     let payload: Record<string, unknown> = {};
 
     if (mode === "create") {
@@ -209,6 +207,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
 
       if (!validation.success) {
         const nextErrors: FieldErrors = {};
+
         for (const issue of validation.error.issues) {
           const fieldName = issue.path[0];
           if (
@@ -222,6 +221,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
             nextErrors[fieldName] = issue.message;
           }
         }
+
         setFieldErrors(nextErrors);
         return;
       }
@@ -235,6 +235,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         imageUrl: validation.data.imageUrl || undefined,
       };
     } else {
+      // Edit mode: only send changed fields
       const changedFields = editableFields.filter((field) => values[field] !== baseValues[field]);
 
       if (changedFields.length === 0) {
@@ -259,27 +260,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         setFieldErrors(nextErrors);
         return;
       }
-=======
-    const validation = productSchema.safeParse(values);
-
-    if (!validation.success) {
-      const nextErrors: FieldErrors = {};
-      for (const issue of validation.error.issues) {
-        const fieldName = issue.path[0];
-        if (
-          fieldName === "title" ||
-          fieldName === "description" ||
-          fieldName === "price" ||
-          fieldName === "stock" ||
-          fieldName === "category" ||
-          fieldName === "imageUrl"
-        ) {
-          nextErrors[fieldName] = issue.message;
-        }
-      }
-      setFieldErrors(nextErrors);
-      return;
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
     }
 
     setFieldErrors({});
@@ -288,23 +268,19 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
     setFormSuccess("");
 
     try {
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+
+      // Idempotency key only for create
+      if (mode === "create") {
+        headers["Idempotency-Key"] = getIdempotencyKey();
+      }
+
       const response = await fetch(endpoint, {
         method: mode === "create" ? "POST" : "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-<<<<<<< HEAD
+        headers,
         body: JSON.stringify(payload),
-=======
-        body: JSON.stringify({
-          title: validation.data.title,
-          description: validation.data.description,
-          price: validation.data.price,
-          stock: validation.data.stock,
-          category: validation.data.category,
-          imageUrl: validation.data.imageUrl || undefined,
-        }),
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       });
 
       const result = (await response.json()) as ProductApiResponse;
@@ -314,9 +290,15 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
         return;
       }
 
+      // Success → reset key so next create is a new operation
+      if (mode === "create") {
+        resetIdempotencyKey();
+      }
+
       setFormSuccess(mode === "create" ? "Product created." : "Product updated.");
 
       const targetId = result.data?.id ?? productId;
+
       if (targetId) {
         router.push(`/products/${targetId}`);
         router.refresh();
@@ -326,6 +308,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
       router.push("/dashboard/products");
       router.refresh();
     } catch {
+      // Keep the same idempotency key so a retry is safe
       setFormError("Could not save product right now. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -354,11 +337,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="title"
               onChange={(e) => updateField("title", e.target.value)}
-<<<<<<< HEAD
               required={mode === "create"}
-=======
-              required
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               value={values.title}
             />
             {fieldErrors.title && <p className={styles.error}>{fieldErrors.title}</p>}
@@ -372,11 +351,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="category"
               onChange={(e) => updateField("category", e.target.value)}
-<<<<<<< HEAD
               required={mode === "create"}
-=======
-              required
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               value={values.category}
             />
             {fieldErrors.category && <p className={styles.error}>{fieldErrors.category}</p>}
@@ -392,11 +367,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               inputMode="decimal"
               min="0.01"
               onChange={(e) => updateField("price", e.target.value)}
-<<<<<<< HEAD
               required={mode === "create"}
-=======
-              required
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               step="0.01"
               type="number"
               value={values.price}
@@ -414,11 +385,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               inputMode="numeric"
               min="0"
               onChange={(e) => updateField("stock", e.target.value)}
-<<<<<<< HEAD
               required={mode === "create"}
-=======
-              required
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               step="1"
               type="number"
               value={values.stock}
@@ -434,11 +401,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
               disabled={isSubmitting}
               id="description"
               onChange={(e) => updateField("description", e.target.value)}
-<<<<<<< HEAD
               required={mode === "create"}
-=======
-              required
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
               value={values.description}
             />
             {fieldErrors.description && <p className={styles.error}>{fieldErrors.description}</p>}
@@ -464,7 +427,6 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
                 <img alt="Product preview" className={styles.uploadPreview} src={previewSrc} />
               )}
 
-              {/* Hidden but still part of form state */}
               <input type="hidden" value={values.imageUrl} readOnly />
             </div>
             {fieldErrors.imageUrl && <p className={styles.error}>{fieldErrors.imageUrl}</p>}
@@ -476,6 +438,7 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
             {formError}
           </p>
         )}
+
         {formSuccess && (
           <p aria-live="polite" className={styles.success} role="status">
             {formSuccess}
@@ -487,11 +450,12 @@ export function ProductForm({ mode, productId, initialValues }: ProductFormProps
             {isUploading
               ? "Uploading image..."
               : isSubmitting
-              ? "Saving..."
-              : mode === "create"
-                ? "Create product"
-                : "Save product"}
+                ? "Saving..."
+                : mode === "create"
+                  ? "Create product"
+                  : "Save product"}
           </Button>
+
           <Button href={cancelHref} variant="secondary">
             Cancel
           </Button>

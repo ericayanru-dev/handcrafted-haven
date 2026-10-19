@@ -6,19 +6,19 @@ export function Footer() {
     <footer className={styles.footer}>
       <Container className={styles.footerInner}>
         <div className={styles.footerText}>
-          <p>Built by WDD 430 Group 6</p>
-          <p>Frontend work for Handcrafted Haven</p>
+          <p>Handcrafted Haven</p>
+          <p>Discover handcrafted goods from trusted makers.</p>
         </div>
 
         <div className={styles.footerLinks}>
-          <a className={styles.footerLink} href="/#featured">
-            Featured
+          <a className={styles.footerLink} href="/products">
+            Browse Products
           </a>
-          <a className={styles.footerLink} href="/#next">
-            Roadmap
+          <a className={styles.footerLink} href="/dashboard/seller-profile/create">
+            Start Selling
           </a>
-          <a className={styles.footerLink} href="/login">
-            Login
+          <a className={styles.footerLink} href="/register">
+            Create Account
           </a>
         </div>
       </Container>

@@ -9,7 +9,7 @@ const highlights = [
   },
   {
     title: "Checks before submit",
-    text: "The form checks the same rules as the backend before it sends anything.",
+    text: "We check your details before you submit so setup is smooth and clear.",
   },
   {
     title: "Matches the rest of the site",
@@ -22,11 +22,10 @@ export default function RegisterPage() {
     <main className={styles.page}>
       <Container className={styles.layout}>
         <section className={styles.intro}>
-          <p className={styles.eyebrow}>Register page</p>
+          <p className={styles.eyebrow}>Join Handcrafted Haven</p>
           <h1 className={styles.title}>Create your Handcrafted Haven account.</h1>
           <p className={styles.subtitle}>
-            Set up your profile, get access to the marketplace, and use the same
-            layout style as the rest of the site.
+            Set up your profile and start exploring products, sellers, and your account tools.
           </p>
 
           <div className={styles.highlights}>

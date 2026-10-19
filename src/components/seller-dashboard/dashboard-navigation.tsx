@@ -11,6 +11,7 @@ type DashboardLink = {
 const links: DashboardLink[] = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/seller-profile", label: "Seller profile" },
+  { href: "/dashboard/inventory", label: "Inventory" },
   { href: "/dashboard/products", label: "My products" },
   { href: "/dashboard/products/create", label: "Add product" },
   { href: "/orders", label: "Orders" },
@@ -31,6 +32,7 @@ export function DashboardNavigation() {
     <nav aria-label="Seller dashboard navigation" className={styles.dashboardNav}>
       {links.map((link) => (
         <a
+          aria-current={isActive(pathname, link.href) ? "page" : undefined}
           className={isActive(pathname, link.href) ? styles.dashboardNavLinkActive : styles.dashboardNavLink}
           href={link.href}
           key={link.href}

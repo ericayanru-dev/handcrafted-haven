@@ -31,7 +31,6 @@ export class SellerProfileModel {
           select: {
             id: true,
             name: true,
-            email: true,
             location: true,
           },
         },
@@ -71,7 +70,6 @@ export class SellerProfileModel {
           select: {
             id: true,
             name: true,
-            email: true,
             location: true,
           },
         },

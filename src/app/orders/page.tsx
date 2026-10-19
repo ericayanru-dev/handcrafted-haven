@@ -1,19 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatCurrency, formatDate, loadOrderHistory, orderNumberFromId, statusLabel, type OrderRecord } from "@/components/orders";
+import {
+  formatCurrency,
+  formatDate,
+  loadOrderHistory,
+  orderNumberFromId,
+  statusLabel,
+  type OrderRecord,
+} from "@/components/orders";
 import { Loading } from "@/components/state/loading";
 import { Button, Card, Container } from "@/components/ui";
 import styles from "@/components/orders/orders.module.css";
 
+type MeResponse = {
+  success?: boolean;
+  user?: {
+    id: string;
+  } | null;
+};
+
 export default function OrderHistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-<<<<<<< HEAD
-=======
-  const [mode, setMode] = useState<"api" | "local">("local");
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
   const [error, setError] = useState("");
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -21,17 +32,29 @@ export default function OrderHistoryPage() {
     async function load() {
       setIsLoading(true);
       setError("");
+      setIsSignedIn(false);
 
       try {
+        const authResponse = await fetch("/api/auth/me", { method: "GET" });
+        const authResult = (await authResponse.json()) as MeResponse;
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (!authResponse.ok || !authResult.success || !authResult.user) {
+          setOrders([]);
+          setIsSignedIn(false);
+          return;
+        }
+
+        setIsSignedIn(true);
+
         const result = await loadOrderHistory();
         if (!isMounted) {
           return;
         }
         setOrders(result.orders);
-<<<<<<< HEAD
-=======
-        setMode(result.mode);
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
       } catch {
         if (isMounted) {
           setError("Could not load order history right now.");
@@ -63,19 +86,26 @@ export default function OrderHistoryPage() {
               <p className={styles.eyebrow}>Orders</p>
               <h1 className={styles.title}>Order history</h1>
             </div>
-            <p className={styles.lead}>Review your past orders and open any order for full details.</p>
+            <p className={styles.lead}>
+              Review your past orders and open any order for full details.
+            </p>
           </header>
 
-<<<<<<< HEAD
-=======
-          {mode === "local" ? (
-            <p className={styles.info}>Order history is running in local mode until backend APIs are ready.</p>
-          ) : null}
-
->>>>>>> 55e8a1f8f8803c88267f0fb0cea65746fada3d39
           {error ? <p className={styles.error}>{error}</p> : null}
 
-          {!error && orders.length === 0 ? (
+          {!error && !isSignedIn ? (
+            <div className={styles.status}>
+              <p>Please sign in to view your order history.</p>
+              <div className={styles.actions}>
+                <Button href="/login">Log in</Button>
+                <Button href="/marketplace" variant="secondary">
+                  Browse marketplace
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          {!error && isSignedIn && orders.length === 0 ? (
             <div className={styles.status}>
               <p>You have not placed any orders yet.</p>
               <div className={styles.actions}>
@@ -84,7 +114,7 @@ export default function OrderHistoryPage() {
             </div>
           ) : null}
 
-          {!error && orders.length > 0 ? (
+          {!error && isSignedIn && orders.length > 0 ? (
             <div className={styles.orderList}>
               {orders.map((order) => (
                 <Card className={styles.orderCard} key={order.id}>
