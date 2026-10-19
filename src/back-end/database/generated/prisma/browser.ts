@@ -67,3 +67,8 @@ export type Review = Prisma.ReviewModel
  * 
  */
 export type IdempotencyKey = Prisma.IdempotencyKeyModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel

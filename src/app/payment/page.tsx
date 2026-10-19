@@ -13,30 +13,30 @@ import {
 } from "@/components/orders";
 import styles from "@/components/payment/payment.module.css";
 
-type UpdateStatusResponse = {
+type InitPaymentResponse = {
   success?: boolean;
-  data?: OrderRecord;
   message?: string;
   error?: string;
+  data?: {
+    provider?: "PAYSTACK" | "PAYPAL" | "COD";
+    paymentId?: string;
+    providerRef?: string;
+    orderId?: string;
+    authorizationUrl?: string;
+    accessCode?: string;
+    approveUrl?: string;
+    paypalOrderId?: string;
+    next?: string;
+  };
 };
 
 function getStatusTone(status?: OrderRecord["status"]) {
   if (status === "PAID" || status === "DELIVERED" || status === "COMPLETED") {
     return styles.statusPaid;
   }
-
-  if (status === "FAILED") {
-    return styles.statusFailed;
-  }
-
-  if (status === "CANCELLED") {
-    return styles.statusCancelled;
-  }
-
-  if (status === "PROCESSING") {
-    return styles.statusProcessing;
-  }
-
+  if (status === "FAILED") return styles.statusFailed;
+  if (status === "CANCELLED") return styles.statusCancelled;
+  if (status === "PROCESSING") return styles.statusProcessing;
   return styles.statusPending;
 }
 
@@ -48,7 +48,7 @@ export default function PaymentPage() {
     OrderRecord["paymentMethod"] | null;
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isCompleting, setIsCompleting] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const [order, setOrder] = useState<OrderRecord | null>(null);
   const [error, setError] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
@@ -68,10 +68,7 @@ export default function PaymentPage() {
 
       try {
         const result = await loadOrderById(orderId);
-
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted) return;
 
         if (!result.order) {
           setError("Order not found.");
@@ -80,68 +77,94 @@ export default function PaymentPage() {
 
         setOrder(result.order);
       } catch {
-        if (isMounted) {
-          setError("Could not load payment details right now.");
-        }
+        if (isMounted) setError("Could not load payment details right now.");
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     }
 
     void load();
-
     return () => {
       isMounted = false;
     };
   }, [orderId]);
 
   const statusToneClass = useMemo(() => getStatusTone(order?.status), [order?.status]);
-  const paymentMethod = paymentMethodParam ?? order?.paymentMethod;
+  const paymentMethod = paymentMethodParam ?? order?.paymentMethod ?? "CARD";
 
-  async function handleCompletePayment() {
-    if (!order) {
+  async function handleStartPayment() {
+    if (!order) return;
+
+    // Already paid
+    if (order.status === "PAID" || order.status === "COMPLETED") {
+      router.push(
+        `/payment/success?orderId=${encodeURIComponent(order.id)}&paymentMethod=${encodeURIComponent(
+          paymentMethod,
+        )}`,
+      );
       return;
     }
 
-    setIsCompleting(true);
+    setIsStarting(true);
     setError("");
     setStatusMessage("");
 
     try {
-      const response = await fetch(`/api/orders/update-status/${order.id}`, {
-        method: "PATCH",
+      const response = await fetch("/api/payments/initialize", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Idempotency-Key": crypto.randomUUID(),
         },
-        body: JSON.stringify({ status: "PAID" }),
+        body: JSON.stringify({
+          orderId: order.id,
+          method: paymentMethod, // CARD | PAYPAL | CASH_ON_DELIVERY
+        }),
       });
 
-      const result = (await response.json()) as UpdateStatusResponse;
+      const result = (await response.json()) as InitPaymentResponse;
 
       if (!response.ok || !result.success || !result.data) {
-        setError(result.message ?? result.error ?? "Could not complete payment.");
+        setError(result.message ?? result.error ?? "Could not start payment.");
         return;
       }
 
-      const refreshed = await loadOrderById(order.id);
-      if (refreshed.order) {
-        setOrder({
-          ...refreshed.order,
-          paymentMethod: refreshed.order.paymentMethod ?? paymentMethod ?? order.paymentMethod,
-        });
+      // COD → confirmation
+      if (result.data.provider === "COD" || paymentMethod === "CASH_ON_DELIVERY") {
+        router.push(
+          `/payment/success?orderId=${encodeURIComponent(order.id)}&paymentMethod=CASH_ON_DELIVERY`,
+        );
+        return;
       }
-      setStatusMessage("Payment completed successfully.");
-      router.push(
-        `/payment/success?orderId=${encodeURIComponent(order.id)}&paymentMethod=${encodeURIComponent(
-          paymentMethod ?? order.paymentMethod ?? ""
-        )}`
-      );
+
+      // Card → Paystack
+      if (result.data.authorizationUrl) {
+        setStatusMessage("Redirecting to secure card payment...");
+        window.location.href = result.data.authorizationUrl;
+        return;
+      }
+
+      // PayPal
+      if (result.data.approveUrl) {
+        // keep ids for return page if needed
+        sessionStorage.setItem(
+          "paypalCheckout",
+          JSON.stringify({
+            orderId: order.id,
+            paypalOrderId: result.data.paypalOrderId,
+            paymentId: result.data.paymentId,
+          }),
+        );
+        setStatusMessage("Redirecting to PayPal...");
+        window.location.href = result.data.approveUrl;
+        return;
+      }
+
+      setError("Payment provider did not return a checkout URL.");
     } catch {
-      setError("Could not complete payment right now. Please try again.");
+      setError("Could not start payment right now. Please try again.");
     } finally {
-      setIsCompleting(false);
+      setIsStarting(false);
     }
   }
 
@@ -149,7 +172,7 @@ export default function PaymentPage() {
     return <Loading message="Loading payment details..." title="Payment" />;
   }
 
-  if (error || !order) {
+  if (error && !order) {
     return (
       <main className={styles.page}>
         <Container size="narrow">
@@ -158,7 +181,7 @@ export default function PaymentPage() {
               <p className={styles.eyebrow}>Payment</p>
               <h1 className={styles.statusTitle}>We couldn&apos;t load the payment page.</h1>
             </div>
-            <p className={styles.error}>{error || "Please try again."}</p>
+            <p className={styles.error}>{error}</p>
             <div className={styles.actions}>
               <Button href="/checkout">Back to checkout</Button>
               <Button href="/orders" variant="secondary">
@@ -171,6 +194,8 @@ export default function PaymentPage() {
     );
   }
 
+  if (!order) return null;
+
   return (
     <main className={styles.page}>
       <Container>
@@ -181,8 +206,7 @@ export default function PaymentPage() {
               <h1 className={styles.title}>Review and complete payment</h1>
             </div>
             <p className={styles.lead}>
-              Confirm your order total, check the payment status, and finish the order when
-              you&apos;re ready.
+              Confirm your order total, then continue to the selected payment method.
             </p>
           </header>
 
@@ -203,7 +227,7 @@ export default function PaymentPage() {
               <dl className={styles.metaList}>
                 <div className={styles.metaRow}>
                   <dt>Payment method</dt>
-                  <dd>{paymentLabel(paymentMethod ?? order.paymentMethod)}</dd>
+                  <dd>{paymentLabel(paymentMethod)}</dd>
                 </div>
                 <div className={styles.metaRow}>
                   <dt>Items</dt>
@@ -216,8 +240,14 @@ export default function PaymentPage() {
               </dl>
 
               <div className={styles.paymentButtonRow}>
-                <Button disabled={isCompleting} onClick={handleCompletePayment}>
-                  {isCompleting ? "Completing payment..." : "Complete payment"}
+                <Button disabled={isStarting} onClick={handleStartPayment}>
+                  {isStarting
+                    ? "Starting payment..."
+                    : paymentMethod === "CASH_ON_DELIVERY"
+                      ? "Confirm cash on delivery"
+                      : paymentMethod === "PAYPAL"
+                        ? "Pay with PayPal"
+                        : "Pay with card"}
                 </Button>
                 <Button href="/checkout" variant="secondary">
                   Back to checkout
@@ -225,8 +255,8 @@ export default function PaymentPage() {
               </div>
 
               <p className={styles.statusText}>
-                This page uses the current order record and status endpoint so the payment flow can
-                be tested before the gateway integration lands.
+                Card payments use Paystack. PayPal opens PayPal checkout. Cash on delivery confirms
+                the order without online payment.
               </p>
             </Card>
 
